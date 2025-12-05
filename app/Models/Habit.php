@@ -39,8 +39,9 @@ class Habit extends Model
         'is_active' => 'boolean',
         'reminder_enabled' => 'boolean',
         'archived_at' => 'datetime',
+        'category' => \App\Enums\HabitCategory::class,
         'difficulty' => HabitDifficulty::class,
-        'frequency' => HabitFrecuency::class,
+        'frequency' => HabitFrequency::class,
     ];
 
     public function user(): BelongsTo
@@ -77,7 +78,7 @@ class Habit extends Model
             return false;
         }
 
-        if($this->frequency === HabitFrecuency::DAILY)
+        if($this->frequency === HabitFrequency::DAILY)
         {
             return true;
         }
@@ -91,9 +92,9 @@ class Habit extends Model
         return false;
     }
 
-    public function isSchedulerForDay(Carbon $date): boolval
+    public function isScheduledForDay(Carbon $date): bool
     {
-        if(!this->is_recurring)
+        if(!$this->is_recurring)
         {
             return false;
         }

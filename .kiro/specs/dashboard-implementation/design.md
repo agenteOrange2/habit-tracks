@@ -11,17 +11,25 @@ El diseño visual se basa en design2.html, adaptándolo a la estructura existent
 ### Component Structure
 
 ```
-resources/views/
-├── livewire/
-│   └── dashboard/
-│       ├── index.blade.php (Main dashboard Volt component)
-│       ├── stats-cards.blade.php (Stats cards section)
-│       ├── pomodoro-timer.blade.php (Pomodoro timer component)
-│       └── habits-list.blade.php (Today's habits list)
-└── components/
-    └── layouts/
-        └── app/
-            └── sidebar.blade.php (Updated with new navigation)
+app/Livewire/Dashboard/
+├── DashboardOverview.php (Main dashboard component)
+├── StatsCards.php (Stats cards section)
+├── PomodoroTimer.php (Pomodoro timer component)
+├── HabitsList.php (Today's habits list)
+├── EnergyBar.php (Energy bar component)
+├── QuickActions.php (Quick actions panel)
+├── StreakCalendar.php (Streak heatmap calendar)
+└── WeeklyProgress.php (Weekly progress component)
+
+resources/views/livewire/dashboard/
+├── dashboard-overview.blade.php
+├── stats-cards.blade.php
+├── pomodoro-timer.blade.php
+├── habits-list.blade.php
+├── energy-bar.blade.php
+├── quick-actions.blade.php
+├── streak-calendar.blade.php
+└── weekly-progress.blade.php
 ```
 
 ### Routes
@@ -149,6 +157,111 @@ public function completeHabit($habitId)
 }
 ```
 
+### 5. Energy Bar Component
+
+**Location:** `app/Livewire/Dashboard/EnergyBar.php`
+
+**Properties:**
+```php
+public $energyStatus;
+```
+
+**Listeners:**
+```php
+protected $listeners = [
+    'energyUpdated' => 'refresh',
+];
+```
+
+**Methods:**
+- `mount(EnergyService $energyService)`: Initialize energy status
+- `refresh(EnergyService $energyService)`: Refresh energy data from service
+
+**Integration:**
+- Uses `EnergyService::getEnergyStatus()` to fetch current energy level
+- Listens for `energyUpdated` events to refresh automatically
+
+### 6. Quick Actions Component
+
+**Location:** `app/Livewire/Dashboard/QuickActions.php`
+
+**Properties:**
+```php
+public $actions = [
+    [
+        'title' => 'Nuevo Hábito',
+        'icon' => '➕',
+        'route' => 'habits.create',
+        'color' => 'blue',
+    ],
+    [
+        'title' => 'Pomodoro',
+        'icon' => '🍅',
+        'route' => 'pomodoro.index',
+        'color' => 'red',
+    ],
+    [
+        'title' => 'Recompensas',
+        'icon' => '🎁',
+        'route' => 'rewards.index',
+        'color' => 'purple',
+    ],
+    [
+        'title' => 'Diario',
+        'icon' => '📝',
+        'route' => 'journal.create',
+        'color' => 'green',
+    ],
+];
+```
+
+**Methods:**
+- `render()`: Display quick actions panel
+
+### 7. Streak Calendar Component
+
+**Location:** `app/Livewire/Dashboard/StreakCalendar.php`
+
+**Properties:**
+```php
+public $heatmapData;
+public $year;
+```
+
+**Methods:**
+- `mount(StatisticsService $statisticsService)`: Load heatmap data for the year
+- `render()`: Display calendar heatmap
+
+**Integration:**
+- Uses `StatisticsService::getHeatmapData()` to fetch activity data for 365 days
+- Displays activity intensity using color gradients
+
+### 8. Weekly Progress Component
+
+**Location:** `app/Livewire/Dashboard/WeeklyProgress.php`
+
+**Properties:**
+```php
+public $weekDays = [];
+```
+
+**Methods:**
+- `mount()`: Initialize weekly progress data
+- `loadWeekProgress()`: Calculate completion percentage for each day of the week
+
+**Data Structure:**
+```php
+[
+    'date' => Carbon,
+    'dayName' => 'Mon',
+    'dayNumber' => '01',
+    'completed' => 5,
+    'total' => 8,
+    'percentage' => 62,
+    'isToday' => true,
+]
+```
+
 ## Data Models
 
 ### Queries Used
@@ -173,6 +286,43 @@ $level = auth()->user()->level;
 $scheduledCount = $todayHabits->count();
 $completedCount = $todayHabits->filter(fn($h) => $h->isCompletedToday())->count();
 $rate = $scheduledCount > 0 ? ($completedCount / $scheduledCount) * 100 : 0;
+```
+
+**Energy Status:**
+```php
+$energyStatus = app(EnergyService::class)->getEnergyStatus(auth()->user());
+```
+
+**Heatmap Data:**
+```php
+$heatmapData = app(StatisticsService::class)->getHeatmapData(auth()->user(), 365);
+```
+
+**Weekly Progress:**
+```php
+$startOfWeek = now()->startOfWeek();
+$weekDays = collect(range(0, 6))->map(function ($day) use ($user, $startOfWeek) {
+    $date = $startOfWeek->copy()->addDays($day);
+    
+    $habitsCompleted = $user->habitLogs()
+        ->whereDate('completed_date', $date)
+        ->count();
+
+    $scheduledHabits = $user->habits()
+        ->where('is_active', true)
+        ->get()
+        ->filter(fn($habit) => $habit->isScheduledForDay($date))
+        ->count();
+
+    return [
+        'date' => $date,
+        'completed' => $habitsCompleted,
+        'total' => $scheduledHabits,
+        'percentage' => $scheduledHabits > 0 
+            ? round(($habitsCompleted / $scheduledHabits) * 100) 
+            : 0,
+    ];
+});
 ```
 
 ## Correctness Properties
@@ -248,6 +398,68 @@ $rate = $scheduledCount > 0 ? ($completedCount / $scheduledCount) * 100 : 0;
 ### Property 12: Timer Toggle Functionality
 
 *For any* timer state (running or paused), clicking the toggle button should switch to the opposite state.
+
+**Validates: Requirements 4.2, 4.4**
+
+### Property 13: Category Color Mapping
+
+*For any* habit with a category, the displayed color and icon should match the values defined in the HabitCategory enum.
+
+**Validates: Requirements 8.5**
+
+### Property 14: Energy Bar Display
+
+*For any* authenticated user, the energy bar should display the current energy level obtained from EnergyService.
+
+**Validates: Requirements 9.1, 9.2**
+
+### Property 15: Energy Percentage Bounds
+
+*For any* energy status, the displayed percentage should be between 0 and 100 inclusive.
+
+**Validates: Requirements 9.3**
+
+### Property 16: Energy Warning State
+
+*For any* energy level below 30%, the energy bar should display in warning color state.
+
+**Validates: Requirements 9.5**
+
+### Property 17: Quick Actions Navigation
+
+*For any* quick action button clicked, the system should navigate to the corresponding route defined in the action configuration.
+
+**Validates: Requirements 10.3**
+
+### Property 18: Quick Actions Completeness
+
+*For any* quick actions panel, it should display all four actions: Nuevo Hábito, Pomodoro, Recompensas, and Diario.
+
+**Validates: Requirements 10.2**
+
+### Property 19: Heatmap Data Range
+
+*For any* streak calendar, the heatmap should display exactly 365 days of activity data.
+
+**Validates: Requirements 11.1**
+
+### Property 20: Weekly Progress Day Count
+
+*For any* weekly progress component, it should display exactly 7 days starting from the beginning of the current week.
+
+**Validates: Requirements 12.1**
+
+### Property 21: Weekly Progress Calculation
+
+*For any* day in the weekly progress, the completion percentage should equal (completed_habits / scheduled_habits) * 100, or 0 if no habits are scheduled.
+
+**Validates: Requirements 12.3**
+
+### Property 22: Today Highlight in Weekly Progress
+
+*For any* weekly progress display, the current day should be visually highlighted.
+
+**Validates: Requirements 12.4**
 
 **Validates: Requirements 4.2, 4.4**
 

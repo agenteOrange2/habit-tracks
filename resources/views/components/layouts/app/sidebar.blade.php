@@ -12,8 +12,10 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                <flux:navlist.group :heading="__('Navigation')" class="grid">
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Resumen General</flux:navlist.item>
+                    <flux:navlist.item icon="chart-bar" href="#" wire:navigate>Estadísticas</flux:navlist.item>
+                    <flux:navlist.item icon="cog" :href="route('profile.edit')" :current="request()->routeIs('profile.edit')" wire:navigate>Configuración</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
@@ -126,6 +128,82 @@
         </flux:header>
 
         {{ $slot }}
+
+        <!-- Toast Notifications -->
+        <div 
+            x-data="{ 
+                show: false, 
+                message: '', 
+                type: 'success',
+                timeout: null
+            }"
+            @notification.window="
+                show = true;
+                message = $event.detail.message;
+                type = $event.detail.type || 'success';
+                clearTimeout(timeout);
+                timeout = setTimeout(() => { show = false }, 5000);
+            "
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-2"
+            class="fixed bottom-4 right-4 z-50 max-w-sm"
+            style="display: none;"
+        >
+            <div 
+                class="rounded-lg shadow-lg p-4 flex items-start gap-3"
+                :class="{
+                    'bg-green-50 border border-green-200 dark:bg-green-900/30 dark:border-green-800': type === 'success',
+                    'bg-red-50 border border-red-200 dark:bg-red-900/30 dark:border-red-800': type === 'error',
+                    'bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800': type === 'info',
+                    'bg-yellow-50 border border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800': type === 'warning'
+                }"
+            >
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    <svg x-show="type === 'success'" class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <svg x-show="type === 'error'" class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <svg x-show="type === 'info'" class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <svg x-show="type === 'warning'" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                
+                <!-- Message -->
+                <div class="flex-1">
+                    <p 
+                        class="text-sm font-medium"
+                        :class="{
+                            'text-green-800 dark:text-green-200': type === 'success',
+                            'text-red-800 dark:text-red-200': type === 'error',
+                            'text-blue-800 dark:text-blue-200': type === 'info',
+                            'text-yellow-800 dark:text-yellow-200': type === 'warning'
+                        }"
+                        x-text="message"
+                    ></p>
+                </div>
+                
+                <!-- Close button -->
+                <button 
+                    @click="show = false"
+                    class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
         @fluxScripts
     </body>

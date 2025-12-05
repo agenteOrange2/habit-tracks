@@ -16,6 +16,10 @@ Este documento define los requisitos para implementar el dashboard principal de 
 - **Pomodoro Timer**: Temporizador de 25 minutos para sesiones de trabajo enfocado
 - **Sidebar**: Barra lateral de navegación
 - **Stats Card**: Tarjeta que muestra una estadística específica del usuario
+- **Energy Bar**: Barra de energía que muestra el nivel de energía actual del usuario
+- **Quick Actions**: Acciones rápidas para acceder a funcionalidades comunes
+- **Streak Calendar**: Calendario de calor que muestra la actividad del usuario durante el año
+- **Weekly Progress**: Visualización del progreso semanal de hábitos completados
 
 ## Requirements
 
@@ -114,3 +118,52 @@ Este documento define los requisitos para implementar el dashboard principal de 
 3. WHEN se completa un hábito THEN el Sistema SHALL invocar AchievementService para verificar logros desbloqueados
 4. WHEN se carga el dashboard THEN el Sistema SHALL utilizar las relaciones Eloquent definidas en los modelos
 5. WHEN se muestran categorías THEN el Sistema SHALL utilizar el enum HabitCategory para colores e iconos
+
+### Requirement 9: Barra de Energía
+
+**User Story:** Como usuario, quiero ver mi nivel de energía actual en el dashboard, para saber cuánta energía tengo disponible para completar hábitos.
+
+#### Acceptance Criteria
+
+1. WHEN el dashboard se carga THEN el Sistema SHALL mostrar una barra de energía con el nivel actual del usuario
+2. WHEN la barra de energía se muestra THEN el Sistema SHALL obtener el estado de energía usando EnergyService
+3. WHEN la barra de energía se renderiza THEN el Sistema SHALL mostrar el porcentaje de energía actual y el máximo
+4. WHEN la energía se actualiza THEN el Sistema SHALL refrescar la barra de energía automáticamente
+5. WHEN la energía está por debajo del 30% THEN el Sistema SHALL mostrar la barra en color de advertencia
+
+### Requirement 10: Acciones Rápidas
+
+**User Story:** Como usuario, quiero tener acceso rápido a las funcionalidades más comunes, para poder realizar acciones frecuentes sin navegar por múltiples páginas.
+
+#### Acceptance Criteria
+
+1. WHEN el dashboard se carga THEN el Sistema SHALL mostrar un panel de acciones rápidas
+2. WHEN el panel de acciones rápidas se muestra THEN el Sistema SHALL incluir botones para "Nuevo Hábito", "Pomodoro", "Recompensas" y "Diario"
+3. WHEN el usuario hace clic en una acción rápida THEN el Sistema SHALL navegar a la ruta correspondiente
+4. WHEN cada acción se muestra THEN el Sistema SHALL incluir un icono distintivo y un color identificativo
+5. WHEN el panel se renderiza THEN el Sistema SHALL aplicar estilos responsivos para móvil y desktop
+
+### Requirement 11: Calendario de Rachas
+
+**User Story:** Como usuario, quiero ver un calendario de calor con mi actividad anual, para visualizar mi consistencia a lo largo del tiempo.
+
+#### Acceptance Criteria
+
+1. WHEN el dashboard se carga THEN el Sistema SHALL mostrar un calendario de calor con los últimos 365 días
+2. WHEN el calendario se renderiza THEN el Sistema SHALL obtener los datos usando StatisticsService
+3. WHEN un día tiene actividad THEN el Sistema SHALL mostrar ese día con intensidad de color proporcional a la actividad
+4. WHEN un día no tiene actividad THEN el Sistema SHALL mostrar ese día con color neutral
+5. WHEN el usuario pasa el cursor sobre un día THEN el Sistema SHALL mostrar un tooltip con la información detallada
+
+### Requirement 12: Progreso Semanal
+
+**User Story:** Como usuario, quiero ver mi progreso de la semana actual, para entender cómo me está yendo en los últimos días.
+
+#### Acceptance Criteria
+
+1. WHEN el dashboard se carga THEN el Sistema SHALL mostrar el progreso de los últimos 7 días
+2. WHEN el progreso semanal se muestra THEN el Sistema SHALL incluir cada día con su nombre, fecha y porcentaje de completitud
+3. WHEN se calcula el progreso de un día THEN el Sistema SHALL dividir hábitos completados entre hábitos programados para ese día
+4. WHEN el día actual se muestra THEN el Sistema SHALL resaltarlo visualmente
+5. WHEN un día tiene 100% de completitud THEN el Sistema SHALL aplicar un estilo de éxito
+6. WHEN un día tiene 0% de completitud THEN el Sistema SHALL aplicar un estilo neutral
