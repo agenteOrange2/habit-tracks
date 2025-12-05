@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corpo Dashboard v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'header': ['Orbitron', 'sans-serif'],
+                        'data': ['Rajdhani', 'monospace'],
+                    },
+                    colors: {
+                        corpo: {
+                            red: '#ef4444',     // Rojo corporativo brillante
+                            darkred: '#7f1d1d', // Rojo sangre oscuro
+                            black: '#09090b',   // Negro fondo
+                            glass: '#18181b',   // Negro panel
+                            text: '#e4e4e7',    // Blanco sucio
+                        }
+                    },
+                    backgroundImage: {
+                        'hex-pattern': "url('data:image/svg+xml,%3Csvg width=\"24\" height=\"40\" viewBox=\"0 0 24 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M0 40c5.523 0 10-4.477 10-10V10c0-5.523-4.477-10-10-10s-10 4.477-10 10v20c0 5.523 4.477 10 10 10z\" fill=\"%23ef4444\" fill-opacity=\"0.03\" fill-rule=\"evenodd\"/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Efecto de cristal esmerilado oscuro */
+        .corpo-glass {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Línea de escaneo vertical */
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+            animation: scan 4s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Texto holográfico */
+        .holo-text {
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+        }
+        
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-corpo-black text-corpo-text font-data antialiased min-h-screen overflow-hidden selection:bg-corpo-red selection:text-white" x-data="corpoSystem()">
+    
+    <div class="fixed inset-0 bg-hex-pattern pointer-events-none z-0"></div>
+    <div class="scan-line"></div>
+
+    <div class="relative z-10 flex h-screen">
+        
+        <aside class="w-20 md:w-64 flex flex-col border-r border-corpo-red/20 bg-corpo-black/90 backdrop-blur-md transition-all duration-300 group">
+            <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-corpo-red/20">
+                <div class="w-8 h-8 bg-corpo-red rounded-sm rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.6)]">
+                    <div class="w-3 h-3 bg-white rotate-0"></div>
+                </div>
+                <span class="hidden md:block ml-4 font-header font-bold tracking-[0.2em] text-sm text-corpo-red">SYNDICATE</span>
+            </div>
+
+            <nav class="flex-1 py-8 flex flex-col gap-2">
+                <a href="#" class="relative flex items-center px-4 md:px-6 py-3 text-white bg-corpo-red/10 border-r-2 border-corpo-red">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    <span class="hidden md:block ml-4 text-xs tracking-widest uppercase font-bold">Operaciones</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-corpo-red/0 to-corpo-red/10 opacity-50"></div>
+                </a>
+                
+                <a href="#" class="flex items-center px-4 md:px-6 py-3 text-gray-500 hover:text-white hover:bg-white/5 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span class="hidden md:block ml-4 text-xs tracking-widest uppercase">Analíticas</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-corpo-red/20 text-center md:text-left">
+                <div class="text-[10px] text-corpo-red uppercase tracking-widest mb-1 hidden md:block">ID Agente</div>
+                <div class="font-header text-white text-sm hidden md:block">CORPO_V</div>
+                <div class="mt-2 w-2 h-2 bg-green-500 rounded-full mx-auto md:mx-0 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative overflow-hidden">
+            
+            <header class="h-16 border-b border-corpo-red/20 bg-corpo-black/50 backdrop-blur flex justify-between items-center px-8">
+                <div class="flex items-center gap-4">
+                    <span class="h-2 w-2 bg-corpo-red animate-pulse"></span>
+                    <h1 class="font-header text-lg uppercase tracking-[0.3em] text-white">Centro de Mando</h1>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <div class="text-[10px] uppercase tracking-widest text-gray-500">Temporizador de Enfoque</div>
+                        <div class="font-header text-2xl text-white tracking-wider holo-text tabular-nums" x-text="formatTime(timer)">25:00</div>
+                    </div>
+                    <button @click="toggleTimer" class="w-10 h-10 rounded border border-corpo-red/50 flex items-center justify-center text-corpo-red hover:bg-corpo-red hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+                        <svg x-show="!running" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg x-show="running" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="corpo-glass p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-2 opacity-50">
+                            <svg class="w-12 h-12 text-corpo-red/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div class="text-[10px] text-corpo-red uppercase tracking-widest mb-1">Nivel de Acceso</div>
+                        <div class="font-header text-4xl text-white holo-text mb-4">NIVEL <span x-text="level">05</span></div>
+                        
+                        <div class="w-full h-1 bg-gray-800 relative overflow-hidden">
+                            <div class="absolute h-full bg-corpo-red shadow-[0_0_10px_rgba(239,68,68,0.8)]" style="width: 65%"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs font-mono text-gray-400">
+                            <span>PROGRESO</span>
+                            <span>65%</span>
+                        </div>
+                    </div>
+
+                    <div class="corpo-glass p-6 relative group">
+                        <div class="text-[10px] text-corpo-red uppercase tracking-widest mb-1">Eficiencia Diaria</div>
+                        <div class="font-header text-4xl text-white holo-text mb-4">92.4%</div>
+                         <div class="grid grid-cols-5 gap-1 h-6 items-end">
+                            <div class="w-full bg-gray-800 h-2"></div>
+                            <div class="w-full bg-gray-800 h-3"></div>
+                            <div class="w-full bg-gray-800 h-full"></div>
+                            <div class="w-full bg-corpo-red h-[80%] shadow-[0_0_5px_rgba(239,68,68,0.5)] animate-pulse"></div>
+                            <div class="w-full bg-gray-800 h-1"></div>
+                        </div>
+                    </div>
+
+                    <div class="corpo-glass p-6 flex flex-col justify-center items-center text-center border-corpo-red/40 shadow-[inset_0_0_20px_rgba(239,68,68,0.1)]">
+                         <div class="font-header text-5xl text-white">04</div>
+                         <div class="text-xs text-gray-500 uppercase tracking-widest mt-2">Directivas Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="corpo-glass min-h-[400px]">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-corpo-red/20 bg-corpo-red/5">
+                        <h3 class="font-header text-sm text-white tracking-widest uppercase">/// Registro de Directivas</h3>
+                        <div class="flex gap-2">
+                             <button class="px-3 py-1 text-[10px] border border-gray-700 text-gray-400 hover:text-white uppercase tracking-wider transition-colors">Filtrar</button>
+                             <button class="px-3 py-1 text-[10px] bg-corpo-red text-black font-bold uppercase tracking-wider hover:bg-white transition-colors">Nueva Directiva</button>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-gray-800">
+                        <template x-for="task in tasks" :key="task.id">
+                            <div class="group flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-all cursor-pointer border-l-2 border-transparent hover:border-corpo-red relative"
+                                 @click="toggleTask(task.id)">
+                                
+                                <div class="flex items-center gap-4">
+                                    <div class="w-5 h-5 border border-gray-600 flex items-center justify-center transition-all"
+                                         :class="task.done ? 'bg-corpo-red border-corpo-red shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-transparent'">
+                                        <div x-show="task.done" class="w-2 h-2 bg-black"></div>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-lg text-gray-200 font-light tracking-wide transition-all" 
+                                           :class="task.done ? 'line-through opacity-40' : ''" x-text="task.name"></p>
+                                        <p class="text-[10px] text-corpo-red uppercase tracking-widest font-bold mt-0.5">
+                                            Protocolo: <span x-text="task.category" class="text-gray-400"></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-6">
+                                    <div class="text-right">
+                                        <span class="block text-[10px] text-gray-600 uppercase">Recompensa</span>
+                                        <span class="font-header text-white text-lg tabular-nums tracking-wider">+<span x-text="task.xp"></span></span>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity text-corpo-red">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </div>
+                                </div>
+                                
+                                <div class="absolute bottom-0 right-0 h-[1px] bg-gradient-to-l from-corpo-red/50 to-transparent w-0 group-hover:w-1/2 transition-all duration-700"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="h-8 border-t border-corpo-red/10 bg-black flex items-center justify-between px-8 text-[10px] text-gray-600 uppercase font-mono tracking-widest">
+                <span>Conexión Segura: ENCRIPTADO</span>
+                <span>Arasaka Corp © 2077</span>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        function corpoSystem() {
+            return {
+                level: 5,
+                timer: 1500,
+                running: false,
+                interval: null,
+                tasks: [
+                    { id: 1, name: 'Revisión de Seguridad del Código', category: 'Seguridad', xp: 200, done: false },
+                    { id: 2, name: 'Optimización de Base de Datos', category: 'Backend', xp: 150, done: true },
+                    { id: 3, name: 'Despliegue de Servidor', category: 'Infraestructura', xp: 300, done: false },
+                    { id: 4, name: 'Actualización de Protocolos', category: 'Gestión', xp: 50, done: false },
+                ],
+                toggleTask(id) {
+                    const t = this.tasks.find(x => x.id === id);
+                    t.done = !t.done;
+                },
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+                toggleTimer() {
+                    this.running = !this.running;
+                    if(this.running) {
+                        this.interval = setInterval(() => { if(this.timer > 0) this.timer--; }, 1000);
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

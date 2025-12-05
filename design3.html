@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'header': ['"Press Start 2P"', 'cursive'],
+                        'terminal': ['"VT323"', 'monospace'],
+                    },
+                    colors: {
+                        // Paleta Retro Corporativa Limitada
+                        'retro-bg': '#e0e0e0', // Gris claro fondo
+                        'retro-panel': '#c0c0c0', // Gris windows 3.1
+                        'retro-dark': '#2d1b2e', // Casi negro
+                        'retro-blue': '#0000aa', // Azul terminal
+                        'retro-cyan': '#55ffff', // Cian brillante data
+                        'retro-yellow': '#ffff55', // Amarillo alerta
+                    },
+                    boxShadow: {
+                        // Sombras duras para efecto bloque 3D
+                        'retro-hard': '4px 4px 0px 0px #000000',
+                        'retro-hard-sm': '2px 2px 0px 0px #000000',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Clase utilitaria para cajas estilo "Ventana Antigua" */
+        .pixel-window {
+            @apply bg-white border-4 border-black shadow-retro-hard;
+        }
+        /* Clase para botones retro */
+        .pixel-btn {
+            @apply border-2 border-black bg-retro-panel px-4 py-2 font-terminal uppercase text-lg shadow-retro-hard-sm active:translate-y-1 active:translate-x-1 active:shadow-none transition-all hover:bg-white;
+        }
+        /* Tablas retro */
+        .pixel-table thead th {
+             @apply border-b-4 border-black bg-retro-panel text-left px-4 py-2 font-terminal text-xl;
+        }
+        .pixel-table tbody td {
+             @apply border-b-2 border-black/20 px-4 py-3 font-terminal text-xl;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-retro-bg font-terminal text-black antialiased h-screen flex overflow-hidden" x-data="retroAdmin()">
+
+    <aside class="w-64 bg-retro-panel border-r-4 border-black flex flex-col shadow-retro-hard z-10">
+        <div class="h-20 flex items-center px-4 border-b-4 border-black bg-retro-blue text-white">
+            <span class="font-header text-xs leading-4 tracking-widest">HABIT<br>SYS.ADMIN</span>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-4 text-xl">
+            <a href="#" class="flex items-center gap-3 px-2 py-1 bg-black text-retro-cyan border-2 border-retro-cyan">
+                <span class="text-retro-yellow">>_</span> Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-2 py-1 hover:bg-black/10 hover:border-2 hover:border-black border-2 border-transparent transition-all">
+                <span class="text-black">>_</span> Mis Hábitos
+            </a>
+            <a href="#" class="flex items-center gap-3 px-2 py-1 hover:bg-black/10 hover:border-2 hover:border-black border-2 border-transparent transition-all">
+                <span class="text-black">>_</span> Pomodoro
+            </a>
+             <a href="#" class="flex items-center gap-3 px-2 py-1 hover:bg-black/10 hover:border-2 hover:border-black border-2 border-transparent transition-all">
+                <span class="text-black">>_</span> Recompensas
+            </a>
+        </nav>
+
+        <div class="p-4 border-t-4 border-black bg-retro-panel font-terminal text-lg">
+            ADMIN_USER: <span class="text-retro-blue">DEV_OP</span>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAF0lEQVQoU2M8c+bMfwYkwIiNjS1IBAA02hL24g2v6AAAAABJRU5ErkJggg==')]">
+        
+        <header class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="font-header text-xl mb-2">PANEL DE CONTROL v1.0</h1>
+                <p class="text-2xl text-black/60">Resumen de rendimiento del sistema.</p>
+            </div>
+            <div class="pixel-window p-3 flex items-center gap-4 bg-retro-blue text-white">
+                 <div class="font-terminal text-3xl text-retro-cyan" x-text="formatTime(timer)">25:00</div>
+                 <button @click="toggleTimer" class="pixel-btn text-xs py-1 h-auto bg-retro-panel text-black">
+                    <span x-text="running ? 'STOP' : 'RUN'"></span>
+                 </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="pixel-window p-6 flex flex-col justify-between border-t-8 border-t-retro-blue relative overflow-hidden">
+                <div class="font-header text-sm text-retro-blue mb-2">NIVEL ACTUAL</div>
+                <div class="flex items-end gap-2">
+                     <span class="font-header text-4xl">12</span>
+                     <span class="text-2xl text-black/50 font-terminal">.450 XP</span>
+                </div>
+                <div class="mt-4 h-6 bg-retro-panel border-2 border-black p-0.5">
+                    <div class="h-full w-[75%] bg-retro-cyan border-r-2 border-black bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEUlEQVQImWNgQAILBhDgAgQAD4ACW06e5z4AAAAASUVORK5CYII=')]"></div>
+                </div>
+            </div>
+
+            <div class="pixel-window p-6 flex flex-col justify-between border-t-8 border-t-retro-yellow">
+                <div class="font-header text-sm text-black/70 mb-2">RACHA ACTIVA</div>
+                <div class="flex items-center gap-4">
+                     <span class="font-header text-4xl text-retro-blue">14</span>
+                     <div class="text-3xl pixelated grayscale" style="image-rendering: pixelated;">🔥</div>
+                </div>
+                <div class="mt-4 text-xl font-terminal">Mejor racha: 22 días</div>
+            </div>
+
+             <div class="pixel-window p-6 flex flex-col justify-between border-t-8 border-t-black bg-black text-retro-cyan">
+                <div class="font-header text-sm text-retro-yellow mb-2">TAREAS HOY</div>
+                <div class="font-header text-4xl text-retro-cyan">04/06</div>
+                 <div class="mt-4 text-xl font-terminal text-retro-yellow animate-pulse">>> SISTEMA ACTIVO <<</div>
+            </div>
+        </div>
+
+        <div class="pixel-window overflow-hidden">
+             <div class="px-4 py-3 bg-retro-panel border-b-4 border-black flex justify-between items-center">
+                <h3 class="font-header text-sm">REGISTRO DE HÁBITOS_</h3>
+                <div class="flex gap-2">
+                    <button class="pixel-btn text-sm py-1">FILTRAR</button>
+                    <button class="pixel-btn text-sm py-1 bg-retro-blue text-retro-cyan border-retro-cyan">+ NUEVO</button>
+                </div>
+            </div>
+            
+            <table class="w-full pixel-table text-left">
+                <thead>
+                    <tr>
+                        <th class="w-16">[X]</th>
+                        <th>NOMBRE DEL HÁBITO</th>
+                        <th>CATEGORIA</th>
+                        <th>EXP.</th>
+                        <th>ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <template x-for="task in tasks" :key="task.id">
+                        <tr class="hover:bg-retro-panel/50 cursor-pointer transition-colors" @click="task.done = !task.done">
+                            <td class="text-center">
+                                <div class="w-6 h-6 border-2 border-black inline-flex items-center justify-center bg-white"
+                                     :class="task.done ? 'bg-retro-blue' : ''">
+                                    <span x-show="task.done" class="text-retro-cyan font-header text-xs">X</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span :class="task.done ? 'line-through text-black/50' : ''" x-text="task.name" class="text-2xl"></span>
+                            </td>
+                            <td>
+                                <span class="border-2 border-black bg-retro-panel px-2 py-0.5 text-lg uppercase" x-text="task.category"></span>
+                            </td>
+                            <td class="font-bold text-retro-blue">
+                                +<span x-text="task.xp"></span> XP
+                            </td>
+                            <td>
+                                <span x-show="task.done" class="text-retro-blue font-bold">COMPLETADO</span>
+                                <span x-show="!task.done" class="text-black/50">PENDIENTE</span>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script>
+        function retroAdmin() {
+            return {
+                timer: 1500,
+                running: false,
+                interval: null,
+                tasks: [
+                    { id: 1, name: 'Despliegue a Producción', category: 'DevOps', xp: 150, done: true },
+                    { id: 2, name: 'Revisar Pull Requests', category: 'Dev', xp: 50, done: false },
+                    { id: 3, name: 'Documentar API', category: 'Docs', xp: 30, done: false },
+                    { id: 4, name: 'Limpiar Base de Datos', category: 'Maint', xp: 100, done: false },
+                    { id: 5, name: 'Team Daily Meeting', category: 'Gestion', xp: 20, done: false },
+                ],
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+                toggleTimer() {
+                    this.running = !this.running;
+                    if(this.running) {
+                        this.interval = setInterval(() => { if(this.timer > 0) this.timer--; }, 1000);
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

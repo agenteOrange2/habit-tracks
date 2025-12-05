@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Pixel Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'pixel': ['"Press Start 2P"', 'cursive'],
+                        'sans': ['"DM Sans"', 'sans-serif'], // Fuente muy limpia y moderna
+                    },
+                    colors: {
+                        // Paleta UI Stardew/Terraria (Menús)
+                        rpg: {
+                            bg: '#fff9ea',      // Crema fondo
+                            panel: '#ffcd6c',   // Naranja panel
+                            border: '#6f3916',  // Marrón oscuro bordes
+                            text: '#4a2810',    // Texto marrón
+                            blue: '#4a9eff',    // Acento azul (Terraria UI)
+                            green: '#7bc83f',   // Acento verde
+                            red: '#ff6b6b'
+                        }
+                    },
+                    boxShadow: {
+                        // Sombra sólida y nítida (Pixel Perfect)
+                        'pixel': '4px 4px 0px 0px #6f3916',
+                        'pixel-sm': '2px 2px 0px 0px #6f3916',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Clases base para uniformidad */
+        .pixel-card {
+            @apply bg-[#ffecc1] border-2 border-rpg-border rounded-lg shadow-pixel-sm p-5;
+        }
+        .pixel-btn {
+            @apply px-4 py-2 border-2 border-rpg-border rounded bg-white hover:bg-rpg-panel active:translate-y-1 active:shadow-none shadow-pixel-sm transition-all font-bold text-rpg-text text-sm;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-rpg-bg text-rpg-text font-sans antialiased min-h-screen flex" x-data="cozyApp()">
+
+    <aside class="w-64 bg-[#ffcd6c] border-r-2 border-rpg-border flex flex-col shadow-pixel z-10">
+        <div class="h-20 flex items-center justify-center border-b-2 border-rpg-border bg-[#ffbd4a]">
+            <div class="w-8 h-8 bg-rpg-blue border-2 border-rpg-border mr-3 animate-bounce"></div>
+            <h1 class="font-pixel text-xs leading-5 text-rpg-border">PIXEL<br>TRACKER</h1>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-white border-2 border-rpg-border rounded shadow-pixel-sm font-bold text-rpg-border">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-rpg-text hover:bg-white/50 border-2 border-transparent hover:border-rpg-border/20 rounded transition-all font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Mis Hábitos
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-rpg-text hover:bg-white/50 border-2 border-transparent hover:border-rpg-border/20 rounded transition-all font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Recompensas
+            </a>
+        </nav>
+
+        <div class="p-4 border-t-2 border-rpg-border bg-[#e8b655]">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white border-2 border-rpg-border rounded overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=Felix" alt="avatar">
+                </div>
+                <div class="leading-tight">
+                    <div class="font-bold text-sm">Usuario</div>
+                    <div class="text-xs opacity-70">Nivel 12</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
+        
+        <header class="h-20 flex items-center justify-between px-8 border-b-2 border-rpg-border bg-white/80 backdrop-blur-sm">
+            <div>
+                <h2 class="font-bold text-xl text-rpg-text">Panel de Control</h2>
+                <p class="text-sm text-rpg-text/60">Bienvenido de nuevo a tu granja de productividad.</p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-[#e0f7fa] border-2 border-rpg-blue rounded px-4 py-2 shadow-pixel-sm">
+                <span class="font-pixel text-xs text-rpg-blue mr-2">TIMER</span>
+                <span class="font-bold text-xl font-mono text-rpg-border w-16 text-center" x-text="formatTime(timer)">25:00</span>
+                <button @click="toggleTimer" class="w-8 h-8 flex items-center justify-center bg-rpg-blue border-2 border-rpg-border rounded hover:bg-blue-400 text-white shadow-sm transition-all active:translate-y-0.5">
+                    <svg x-show="!running" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg x-show="running" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="pixel-card bg-white flex flex-col justify-between h-32 relative overflow-hidden">
+                    <div class="text-sm font-bold text-rpg-text/60 uppercase">Nivel Actual</div>
+                    <div class="font-pixel text-2xl text-rpg-blue mt-1">LVL 05</div>
+                    <div class="w-full bg-gray-200 h-2 rounded-full border border-rpg-border mt-auto">
+                        <div class="bg-rpg-green h-full rounded-full border-r border-rpg-border" style="width: 70%"></div>
+                    </div>
+                </div>
+
+                <div class="pixel-card bg-white flex flex-col justify-between h-32">
+                    <div class="text-sm font-bold text-rpg-text/60 uppercase">Monedas (XP)</div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl">🪙</span>
+                        <span class="font-pixel text-xl text-rpg-border">1,250</span>
+                    </div>
+                </div>
+
+                <div class="pixel-card bg-white flex flex-col justify-between h-32">
+                    <div class="text-sm font-bold text-rpg-text/60 uppercase">Racha</div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl">🔥</span>
+                        <span class="font-pixel text-xl text-rpg-red">14 Días</span>
+                    </div>
+                </div>
+                 <div class="pixel-card bg-[#d1e7dd] flex flex-col justify-center items-center h-32 cursor-pointer hover:bg-[#c1d7cd] transition-colors">
+                    <span class="text-3xl text-rpg-border mb-2">+</span>
+                    <span class="font-bold text-sm uppercase">Nuevo Hábito</span>
+                </div>
+            </div>
+
+            <div class="border-2 border-rpg-border rounded-lg bg-white shadow-pixel overflow-hidden">
+                <div class="bg-[#ffecc1] px-6 py-4 border-b-2 border-rpg-border flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-rpg-border flex items-center gap-2">
+                        <span>📋</span> Registro de Tareas
+                    </h3>
+                    <div class="flex gap-2">
+                        <button class="pixel-btn text-xs bg-white">Filtrar</button>
+                        <button class="pixel-btn text-xs bg-rpg-blue text-white hover:bg-blue-500">Exportar</button>
+                    </div>
+                </div>
+
+                <table class="w-full text-left">
+                    <thead class="bg-[#fff9ea] text-rpg-text/70 text-sm uppercase">
+                        <tr>
+                            <th class="px-6 py-3 font-bold border-b-2 border-rpg-border/20">Estado</th>
+                            <th class="px-6 py-3 font-bold border-b-2 border-rpg-border/20">Nombre del Hábito</th>
+                            <th class="px-6 py-3 font-bold border-b-2 border-rpg-border/20">Categoría</th>
+                            <th class="px-6 py-3 font-bold border-b-2 border-rpg-border/20">Recompensa</th>
+                            <th class="px-6 py-3 font-bold border-b-2 border-rpg-border/20">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-rpg-border/10">
+                        <template x-for="habit in habits" :key="habit.id">
+                            <tr class="hover:bg-yellow-50 transition-colors group">
+                                <td class="px-6 py-4">
+                                    <button @click="toggleHabit(habit.id)" 
+                                            class="w-6 h-6 border-2 border-rpg-border rounded bg-white flex items-center justify-center hover:border-rpg-green transition-all shadow-sm active:translate-y-0.5"
+                                            :class="habit.done ? 'bg-rpg-green border-rpg-green' : ''">
+                                        <svg x-show="habit.done" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-rpg-text text-base" :class="habit.done ? 'line-through opacity-50' : ''" x-text="habit.name"></span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-[#ffecc1] text-rpg-text border border-rpg-border/30" x-text="habit.category"></span>
+                                </td>
+                                <td class="px-6 py-4 font-mono text-rpg-green font-bold">
+                                    +<span x-text="habit.xp"></span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="text-rpg-text/40 hover:text-rpg-red transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                
+                <div class="px-6 py-3 border-t border-rpg-border/20 bg-[#fff9ea] flex justify-between items-center text-sm text-rpg-text/60">
+                    <span>Mostrando 4 de 12 hábitos</span>
+                    <div class="flex gap-2">
+                        <button class="hover:text-rpg-text disabled:opacity-50">&larr; Anterior</button>
+                        <button class="hover:text-rpg-text disabled:opacity-50">Siguiente &rarr;</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function cozyApp() {
+            return {
+                timer: 1500,
+                running: false,
+                interval: null,
+                habits: [
+                    { id: 1, name: 'Revisar Pull Requests', category: 'Dev', xp: 50, done: true },
+                    { id: 2, name: 'Documentación API', category: 'Trabajo', xp: 30, done: false },
+                    { id: 3, name: 'Beber Agua (2L)', category: 'Salud', xp: 10, done: false },
+                    { id: 4, name: 'Caminar 30 min', category: 'Salud', xp: 20, done: false },
+                ],
+                toggleHabit(id) {
+                    const h = this.habits.find(x => x.id === id);
+                    h.done = !h.done;
+                },
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+                toggleTimer() {
+                    this.running = !this.running;
+                    if(this.running) {
+                        this.interval = setInterval(() => { if(this.timer > 0) this.timer--; }, 1000);
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

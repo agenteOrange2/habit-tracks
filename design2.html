@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitPro - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5', // Indigo corporativo
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 antialiased" x-data="proApp()">
+
+    <div class="min-h-screen flex flex-col md:flex-row">
+        
+        <aside class="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div class="h-16 flex items-center px-6 border-b border-gray-100">
+                <div class="w-6 h-6 bg-primary-600 rounded mr-3"></div>
+                <span class="font-bold text-lg tracking-tight text-slate-900">Focus<span class="text-primary-600">Flow</span></span>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 bg-primary-50 text-primary-700 rounded-md font-medium text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Resumen General
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-gray-50 hover:text-slate-900 rounded-md font-medium text-sm transition-colors">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Estadísticas
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-gray-50 hover:text-slate-900 rounded-md font-medium text-sm transition-colors">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    Configuración
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center gap-3">
+                    <img class="h-9 w-9 rounded-full bg-gray-300" src="https://ui-avatars.com/api/?name=User+Dev&background=random" alt="">
+                    <div>
+                        <p class="text-sm font-medium text-slate-900">Usuario Demo</p>
+                        <p class="text-xs text-slate-500">Plan Pro</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <header class="flex justify-between items-end mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Buenos días, Usuario</h1>
+                    <p class="text-slate-500 mt-1">Aquí tienes el resumen de tus objetivos de hoy.</p>
+                </div>
+                <div class="flex items-center bg-white shadow-sm border border-gray-200 rounded-lg p-2 gap-4">
+                    <div class="px-4 border-r border-gray-200">
+                        <span class="block text-xs text-slate-400 uppercase font-semibold">Focus Timer</span>
+                        <span class="font-mono text-xl font-medium text-slate-700" x-text="formatTime(timer)">25:00</span>
+                    </div>
+                    <button @click="toggleTimer" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 text-white hover:bg-slate-800 transition">
+                        <svg x-show="!running" class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg x-show="running" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">Productivity Score</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1">Nivel 12</h3>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            +4.5%
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                        <div class="bg-primary-600 h-1.5 rounded-full transition-all duration-500" style="width: 75%"></div>
+                    </div>
+                    <p class="text-xs text-slate-400">750 / 1000 XP para el siguiente nivel</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">Racha de Actividad</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1">14 Días</h3>
+                        </div>
+                        <div class="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex gap-1">
+                        <template x-for="i in 7">
+                            <div class="h-2 flex-1 rounded-sm" :class="i > 2 ? 'bg-primary-600' : 'bg-gray-200'"></div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Tasa de Completitud</p>
+                        <div class="flex items-end gap-2 mt-1">
+                            <h3 class="text-2xl font-bold text-slate-900">85%</h3>
+                            <span class="text-sm text-slate-400 mb-1">hoy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
+                    <h3 class="text-base font-semibold text-slate-800">Objetivos Prioritarios</h3>
+                    <button class="text-sm text-primary-600 font-medium hover:text-primary-700">Gestionar</button>
+                </div>
+                
+                <div class="divide-y divide-gray-100">
+                    <template x-for="task in tasks" :key="task.id">
+                        <div class="flex items-center px-6 py-4 hover:bg-gray-50 transition-colors group">
+                            <button @click="toggleTask(task.id)" 
+                                    class="flex-shrink-0 w-5 h-5 rounded border transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                                    :class="task.done ? 'bg-primary-600 border-primary-600' : 'border-gray-300 bg-white hover:border-primary-600'">
+                                <svg x-show="task.done" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </button>
+
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-slate-900 transition-all" 
+                                       :class="task.done ? 'line-through text-slate-400' : ''" 
+                                       x-text="task.name"></p>
+                                    
+                                    <span x-show="!task.done" class="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 group-hover:border-slate-300">
+                                        +<span x-text="task.xp"></span> pts
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                                          :class="getCategoryColor(task.category)">
+                                        <span x-text="task.category"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function proApp() {
+            return {
+                timer: 1500,
+                running: false,
+                interval: null,
+                tasks: [
+                    { id: 1, name: 'Revisión de métricas semanales', category: 'Trabajo', xp: 50, done: false },
+                    { id: 2, name: 'Sesión de Deep Work (Laravel)', category: 'Desarrollo', xp: 100, done: true },
+                    { id: 3, name: 'Lectura técnica', category: 'Aprendizaje', xp: 30, done: false },
+                    { id: 4, name: 'Actualizar JIRA', category: 'Gestión', xp: 20, done: false },
+                ],
+                getCategoryColor(cat) {
+                    const map = {
+                        'Trabajo': 'bg-blue-50 text-blue-700',
+                        'Desarrollo': 'bg-indigo-50 text-indigo-700',
+                        'Aprendizaje': 'bg-emerald-50 text-emerald-700',
+                        'Gestión': 'bg-gray-100 text-gray-600'
+                    };
+                    return map[cat] || 'bg-gray-100 text-gray-600';
+                },
+                toggleTask(id) {
+                    const t = this.tasks.find(x => x.id === id);
+                    t.done = !t.done;
+                },
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+                toggleTimer() {
+                    this.running = !this.running;
+                    if(this.running) {
+                        this.interval = setInterval(() => { if(this.timer > 0) this.timer--; }, 1000);
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

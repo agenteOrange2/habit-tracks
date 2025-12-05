@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Hero Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb', // Azul vibrante del diseño original
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-600 font-sans h-screen flex overflow-hidden" x-data="habitDashboard()">
+
+    <aside class="w-20 lg:w-64 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 transition-all duration-300">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <span class="font-bold text-slate-800 text-lg hidden lg:block">Habit<span class="text-brand-600">Hero</span></span>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="#" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="hidden lg:block">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-gray-50 rounded-xl transition-colors">
+                <div class="relative">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </div>
+                <span class="hidden lg:block">Misiones (Inbox)</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-gray-50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <span class="hidden lg:block">Inventario</span>
+            </a>
+            
+            <div class="pt-8 pb-2 px-3 hidden lg:block">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Gestión</p>
+            </div>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-gray-50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="hidden lg:block">Analíticas</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100 flex items-center gap-3">
+            <img src="https://ui-avatars.com/api/?name=User+Dev&background=random" class="w-9 h-9 rounded-full border-2 border-white shadow-sm">
+            <div class="hidden lg:block">
+                <p class="text-sm font-semibold text-slate-800">Dev Player</p>
+                <p class="text-xs text-slate-400">Nivel 12 • Hero</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        <header class="px-8 py-6 bg-white flex justify-between items-center flex-shrink-0">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">¡Hola, Guerrero! 👋</h1>
+                <p class="text-sm text-slate-500 mt-1">Aquí tienes el resumen de tu aventura hoy.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                 <div class="text-right hidden sm:block">
+                    <p class="text-xs text-slate-400 font-medium uppercase">Hora del Servidor</p>
+                    <p class="text-sm font-bold text-slate-700">Martes, 10:50 am</p>
+                 </div>
+                 <button class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg shadow-brand-500/30 flex items-center gap-2 transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nuevo Hábito
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
+            
+            <div class="flex flex-col xl:flex-row gap-6">
+                
+                <div class="flex-1 space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-500 font-medium text-sm">Nivel Actual</p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">12</h3>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+                                <div class="bg-brand-600 h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                            <p class="text-xs text-slate-400">650 / 1000 XP para subir</p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-500 font-medium text-sm">Racha de Fuego</p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">15</h3>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="flex gap-1 h-2">
+                                <div class="w-1/5 bg-brand-600 rounded-full"></div>
+                                <div class="w-1/5 bg-brand-600 rounded-full"></div>
+                                <div class="w-1/5 bg-brand-600 rounded-full"></div>
+                                <div class="w-1/5 bg-gray-200 rounded-full"></div>
+                                <div class="w-1/5 bg-gray-200 rounded-full"></div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-2">3 días más para bono extra</p>
+                        </div>
+
+                         <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-500 font-medium text-sm">Misiones Hoy</p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">4<span class="text-lg text-slate-400 font-normal">/8</span></h3>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 50%"></div>
+                            </div>
+                            <p class="text-xs text-slate-400">50% Completado</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800">Logros Recientes</h3>
+                                <button class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-slate-400 hover:bg-gray-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Alquimista Jr.</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Completaste 5 hábitos de Salud.</p>
+                                        <div class="flex gap-2 mt-1">
+                                            <span class="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+500 XP</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Sabio del Código</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Racha de 7 días en Desarrollo.</p>
+                                        <div class="flex gap-2 mt-1">
+                                            <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">Badge Nuevo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800">Recompensas Activas</h3>
+                                <button class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-slate-400 hover:bg-gray-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+                            
+                             <div class="space-y-4">
+                                <div class="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+                                    <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Poción de Tiempo</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">1x Sesión Pomodoro Extra.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Bono de Oro</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Doble XP en el próximo hábito.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-4">
+                                <h3 class="font-bold text-slate-800 text-lg">Misiones de Hoy</h3>
+                                <div class="flex bg-gray-100 p-1 rounded-lg">
+                                    <button class="px-3 py-1 bg-white shadow-sm rounded-md text-xs font-bold text-slate-800">Pendientes (4)</button>
+                                    <button class="px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-700">Todas</button>
+                                </div>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100 group cursor-pointer" @click="toggleTask(1)">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm flex items-center justify-center bg-blue-100 text-blue-600">
+                                        💻
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">Sesión de Deep Work</h4>
+                                        <p class="text-xs text-slate-500 mt-0.5 max-w-md">2 horas de programación sin distracciones en Laravel.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">Prioridad Alta</span>
+                                    <button class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 group-hover:bg-brand-600 group-hover:text-white group-hover:border-transparent transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100 group cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm flex items-center justify-center bg-orange-100 text-orange-600">
+                                        💪
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">Entrenamiento Físico</h4>
+                                        <p class="text-xs text-slate-500 mt-0.5">Rutina de calistenia 30 min.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100">Media</span>
+                                    <button class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 group-hover:bg-brand-600 group-hover:text-white group-hover:border-transparent transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                             <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100 group cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm flex items-center justify-center bg-green-100 text-green-600">
+                                        📚
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">Lectura Técnica</h4>
+                                        <p class="text-xs text-slate-500 mt-0.5">Leer 10 páginas de documentación.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-100">Baja</span>
+                                    <button class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 group-hover:bg-brand-600 group-hover:text-white group-hover:border-transparent transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="w-full xl:w-80 space-y-6">
+                    
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-sm">Agosto 2025</h3>
+                            <button class="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-slate-400 hover:bg-gray-50">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs mb-2">
+                            <div class="text-slate-400 font-medium">L</div>
+                            <div class="text-slate-400 font-medium">M</div>
+                            <div class="text-slate-400 font-medium">M</div>
+                            <div class="text-slate-400 font-medium">J</div>
+                            <div class="text-slate-400 font-medium">V</div>
+                            <div class="text-slate-400 font-medium">S</div>
+                            <div class="text-slate-400 font-medium">D</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center text-sm">
+                            <div></div><div></div><div></div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-gray-50 cursor-pointer">1</div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-gray-50 cursor-pointer">2</div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-gray-50 cursor-pointer">3</div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-gray-50 cursor-pointer">4</div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full bg-brand-600 text-white shadow-md shadow-brand-500/30">21</div>
+                            <div class="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-gray-50 cursor-pointer">22</div>
+                            </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm h-full max-h-[400px]">
+                         <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-slate-800 text-sm">Cronología</h3>
+                        </div>
+
+                        <div class="space-y-6 relative">
+                            <div class="absolute left-3.5 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+
+                            <div class="relative flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white border-2 border-brand-500 flex-shrink-0 z-10 flex items-center justify-center">
+                                    <div class="w-2.5 h-2.5 bg-brand-500 rounded-full"></div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-xl w-full">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-bold text-slate-700 text-xs">Misión Completada</p>
+                                        <span class="text-[10px] text-slate-400">10:30 am</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">Bebiste 2L de agua.</p>
+                                </div>
+                            </div>
+
+                             <div class="relative flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex-shrink-0 z-10 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="bg-white border border-gray-100 p-3 rounded-xl w-full shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-bold text-slate-700 text-xs">Próximo Evento</p>
+                                        <span class="text-[10px] text-slate-400">02:00 pm</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">Sesión de Gimnasio.</p>
+                                </div>
+                            </div>
+                             <div class="relative flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex-shrink-0 z-10 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="bg-white border border-gray-100 p-3 rounded-xl w-full shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-bold text-slate-700 text-xs">Revisión Diaria</p>
+                                        <span class="text-[10px] text-slate-400">08:00 pm</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">Log de hábitos nocturno.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function habitDashboard() {
+            return {
+                toggleTask(id) {
+                    // Logic for livewire hook
+                    console.log('Task toggled:', id);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

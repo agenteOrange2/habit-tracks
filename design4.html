@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk 2077 Admin HUD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cyber': ['Rajdhani', 'sans-serif'],
+                        'mono': ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    },
+                    colors: {
+                        // Paleta Oficial Cyberpunk 2077
+                        cyber: {
+                            yellow: '#FCEE0A', // El amarillo icónico
+                            blue: '#00F0FF',    // Cian neón
+                            red: '#FF003C',     // Rojo "Samurai"
+                            dark: '#080808',    // Fondo casi negro
+                            darker: '#030303',  // Fondo paneles
+                            gray: '#1a1a1a',    // Elementos UI
+                            lightgray: '#3a3a3a'
+                        }
+                    },
+                    boxShadow: {
+                        // Glows de neón
+                        'neon-yellow': '0 0 10px rgba(252, 238, 10, 0.7), 0 0 20px rgba(252, 238, 10, 0.5)',
+                        'neon-blue': '0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Efecto de Glitch en texto (simple) */
+        .glitch-text {
+            text-shadow: 2px 0 0 rgba(255,0,60,0.7), -2px 0 0 rgba(0,240,255,0.7);
+        }
+        /* Bordes técnicos decorativos */
+        .tech-border {
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+        .tech-border::before {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 15px; height: 15px;
+            background: theme('colors.cyber.yellow');
+            clip-path: polygon(100% 0, 0 100%, 100% 100%);
+        }
+
+        /* Fondo de cuadrícula tecnológica */
+        body {
+            background-color: theme('colors.cyber.dark');
+            background-image: 
+                linear-gradient(rgba(252, 238, 10, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(252, 238, 10, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        /* Scanlines sutiles */
+        body::after {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 1px, transparent 1px, transparent 3px);
+            pointer-events: none; z-index: 99;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="text-gray-300 font-cyber uppercase tracking-wider antialiased h-screen flex overflow-hidden" x-data="cyberApp()">
+
+    <aside class="w-72 bg-cyber-darker border-r-2 border-cyber-gray flex flex-col relative z-10">
+        <div class="h-24 flex items-center px-6 border-b-2 border-cyber-yellow/50 relative overflow-hidden bg-cyber-yellow/5">
+            <div class="absolute top-0 left-0 w-full h-1 bg-cyber-yellow shadow-neon-yellow"></div>
+            <div>
+                <h1 class="text-2xl font-bold text-cyber-yellow glitch-text">HABIT//NET.RUNNER</h1>
+                <p class="text-xs text-cyber-blue font-mono">Sys.Ver 2.0.77 <span class="animate-pulse">_</span></p>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-6 space-y-6">
+            <a href="#" class="flex items-center justify-between px-4 py-3 bg-cyber-yellow text-cyber-dark font-bold -skew-x-12 transform border-l-4 border-cyber-blue shadow-neon-yellow transition-all hover:scale-105">
+                <div class="flex items-center gap-4 skew-x-12">
+                    <span>[■]</span>
+                    <span>DASHBOARD_ACTIVO</span>
+                </div>
+            </a>
+            
+            <a href="#" class="flex items-center gap-4 px-4 py-3 text-cyber-gray hover:text-cyber-blue hover:bg-cyber-blue/10 border border-transparent hover:border-cyber-blue transition-all group">
+                <span class="text-cyber-red group-hover:text-cyber-blue">//</span>
+                <span>MISIÓNES (HÁBITOS)</span>
+            </a>
+             <a href="#" class="flex items-center gap-4 px-4 py-3 text-cyber-gray hover:text-cyber-blue hover:bg-cyber-blue/10 border border-transparent hover:border-cyber-blue transition-all group">
+                <span class="text-cyber-red group-hover:text-cyber-blue">//</span>
+                <span>IMPLANTES (REWARDS)</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t-2 border-cyber-gray bg-cyber-darker relative">
+            <div class="absolute bottom-0 right-0 w-4 h-4 bg-cyber-red"></div>
+            <p class="text-sm text-cyber-gray mb-2">ESTADO DEL AGENTE:</p>
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-cyber-yellow/20 border-2 border-cyber-yellow flex items-center justify-center overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=V&background=FCEE0A&color=080808" class="grayscale contrast-200">
+                </div>
+                <div>
+                    <p class="text-cyber-blue font-bold text-lg">V. (MERC)</p>
+                    <p class="text-xs text-cyber-red font-mono">REP: CALLEJERA_</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+        <header class="mb-10 flex flex-col md:flex-row justify-between items-end gap-6 border-b border-cyber-gray/50 pb-4 relative">
+            <div class="absolute bottom-0 left-0 w-1/3 h-0.5 bg-cyber-blue shadow-neon-blue"></div>
+            
+            <div class="flex gap-6 items-center">
+                <div class="text-5xl font-bold text-cyber-yellow glitch-text drop-shadow-neon-yellow">
+                    LVL.<span x-text="level">12</span>
+                </div>
+                <div class="w-64">
+                    <div class="flex justify-between text-sm text-cyber-blue font-mono mb-1">
+                        <span>PROGRESO DE EXPERIENCIA</span>
+                        <span><span x-text="xp">4500</span> / 6000 XP</span>
+                    </div>
+                    <div class="h-5 bg-cyber-gray border border-cyber-blue/30 p-0.5 flex gap-0.5">
+                        <template x-for="i in 20">
+                            <div class="flex-1 h-full" :class="(xp/6000 * 20) > i ? 'bg-cyber-blue shadow-neon-blue' : 'bg-cyber-darker'"></div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-cyber-darker border-2 border-cyber-red p-4 flex items-center gap-6 relative overflow-hidden group">
+                 <div class="absolute top-0 right-0 w-0 h-0 border-t-[20px] border-r-[20px] border-t-cyber-red border-r-transparent"></div>
+                 <div class="absolute -inset-1 bg-cyber-red/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+
+                 <div class="text-right">
+                     <p class="text-cyber-red text-xs font-mono">PROTOCOLO DE ENFOQUE</p>
+                     <div class="font-mono text-4xl text-white glitch-text" x-text="formatTime(timer)">25:00</div>
+                 </div>
+                 <button @click="toggleTimer" 
+                         class="h-12 w-12 bg-cyber-red text-cyber-dark flex items-center justify-center border-2 border-white hover:bg-white hover:text-cyber-red transition-all active:scale-95">
+                    <svg x-show="!running" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.35-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                    <svg x-show="running" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                 </button>
+            </div>
+        </header>
+
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl text-cyber-blue font-bold flex items-center gap-2">
+                    <span class="text-cyber-yellow">>></span> REGISTRO DE MISIONES ACTIVAS
+                </h2>
+                <button class="px-6 py-2 bg-cyber-yellow text-cyber-dark font-bold -skew-x-12 border-2 border-cyber-yellow hover:bg-transparent hover:text-cyber-yellow transition-all">
+                    <span class="skew-x-12">+ NUEVO CONTRATO</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="task in tasks" :key="task.id">
+                    <div class="tech-border bg-cyber-gray border-l-4 border-cyber-gray p-4 flex justify-between items-center group transition-all hover:border-cyber-yellow hover:bg-cyber-lightgray cursor-pointer relative"
+                         :class="task.done ? 'opacity-60 border-cyber-dark' : 'border-cyber-yellow/50'">
+                        
+                        <div class="absolute left-0 top-0 h-full w-0.5 bg-cyber-yellow opacity-0 group-hover:opacity-100 transition-all shadow-neon-yellow"></div>
+
+                        <div class="flex items-center gap-6 z-10">
+                            <div @click="toggleTask(task.id)"
+                                 class="w-8 h-8 border-2 border-cyber-gray bg-cyber-dark flex items-center justify-center overflow-hidden transition-all group-hover:border-cyber-yellow"
+                                 :class="task.done ? 'bg-cyber-yellow border-cyber-yellow shadow-neon-yellow' : ''">
+                                <div x-show="task.done" class="w-full h-full bg-cyber-yellow flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-cyber-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold transition-all" 
+                                    :class="task.done ? 'line-through text-cyber-red' : 'text-white group-hover:text-cyber-yellow'"
+                                    x-text="task.name"></h3>
+                                <div class="flex gap-2 mt-1 font-mono text-xs text-cyber-blue/70">
+                                    <span>[CAT: <span x-text="task.category"></span>]</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right z-10">
+                            <div class="text-sm text-cyber-gray">RECOMPENSA</div>
+                            <div class="text-2xl font-bold text-cyber-yellow glitch-text">
+                                +<span x-text="task.xp"></span> <span class="text-sm">EURODOLLARS (XP)</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function cyberApp() {
+            return {
+                level: 12,
+                xp: 4500,
+                timer: 1500,
+                running: false,
+                interval: null,
+                tasks: [
+                    { id: 1, name: 'Hackear Terminal Arasaka (Codificar)', category: 'Netrunning', xp: 250, done: true },
+                    { id: 2, name: 'Entrenamiento Físico', category: 'Solo', xp: 100, done: false },
+                    { id: 3, name: 'Revisar Blackmarket (Emails)', category: 'Fixer', xp: 50, done: false },
+                    { id: 4, name: 'Mantenimiento de Cyberdeck', category: 'Techie', xp: 150, done: false },
+                ],
+                toggleTask(id) {
+                    const t = this.tasks.find(x => x.id === id);
+                    t.done = !t.done;
+                    // Sonido de interfaz (opcional, mental)
+                },
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+                toggleTimer() {
+                    this.running = !this.running;
+                    if(this.running) {
+                        this.interval = setInterval(() => { if(this.timer > 0) this.timer--; }, 1000);
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
