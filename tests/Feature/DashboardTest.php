@@ -98,6 +98,8 @@ test('dashboard includes all integrated components', function () {
     $response->assertSeeLivewire('dashboard.quick-actions');
     $response->assertSeeLivewire('dashboard.weekly-progress');
     $response->assertSeeLivewire('dashboard.streak-calendar');
+    $response->assertSeeLivewire('dashboard.recent-achievements');
+    $response->assertSeeLivewire('dashboard.active-rewards');
 });
 test('d
 ashboard layout is responsive', function () {

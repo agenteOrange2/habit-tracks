@@ -13,6 +13,11 @@ class Index extends Component
     public float $completionRate = 0;
     public $todayHabits;
 
+    protected $listeners = [
+        'habitCompleted' => 'refreshStats',
+        'habitUncompleted' => 'refreshStats',
+    ];
+
     public function mount(): void
     {
         $this->greeting = $this->getGreeting();
@@ -20,22 +25,32 @@ class Index extends Component
         $this->calculateCompletionRate();
     }
 
-    #[Computed(cache: true, seconds: 300)]
+    public function refreshStats(): void
+    {
+        // Reload habits and recalculate completion rate
+        $this->loadTodayHabits();
+        $this->calculateCompletionRate();
+        
+        // Force refresh of the entire component to update computed properties
+        $this->dispatch('$refresh');
+    }
+
+    #[Computed]
     public function userLevel()
     {
-        return Auth::user()->level;
+        return Auth::user()->fresh()->level;
     }
 
-    #[Computed(cache: true, seconds: 300)]
+    #[Computed]
     public function userStats()
     {
-        return Auth::user()->stats;
+        return Auth::user()->fresh()->stats;
     }
 
-    #[Computed(cache: true, seconds: 300)]
+    #[Computed]
     public function currentStreak()
     {
-        return Auth::user()->stats->current_global_streak ?? 0;
+        return Auth::user()->fresh()->stats->current_global_streak ?? 0;
     }
 
     protected function getGreeting(): string
@@ -59,8 +74,7 @@ class Index extends Component
         $this->todayHabits = $user->habits()
             ->where('is_active', true)
             ->with([
-                'logs' => fn($q) => $q->whereDate('completed_date', today()),
-                'category'
+                'logs' => fn($q) => $q->whereDate('completed_date', today())
             ])
             ->get()
             ->filter(fn($habit) => $habit->isScheduledForToday());
@@ -81,7 +95,6 @@ class Index extends Component
 
     public function render()
     {
-        return view('livewire.dashboard.index')
-            ->layout('components.layouts.app');
+        return view('livewire.dashboard.index');
     }
 }

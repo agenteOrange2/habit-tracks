@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Hábito - Notion Full Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: #37352F;
+        }
+
+        /* Sidebar estático para dar contexto */
+        .sidebar { background: #F7F7F5; border-right: 1px solid #E9E9E7; }
+        
+        /* Inputs estilo Notion Page Property */
+        .notion-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9B9A97;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notion-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(55, 53, 47, 0.16);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .notion-input:hover { border-color: rgba(55, 53, 47, 0.3); }
+        .notion-input:focus { 
+            border-color: #2383E2; 
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2); 
+            outline: none;
+        }
+
+        /* Grid de Iconos limpio */
+        .icon-box {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .icon-box:hover { background: #EFEFED; }
+        .icon-box.active { background: #E7F3F8; box-shadow: inset 0 0 0 1px #2383E2; }
+
+        /* Colores */
+        .color-option {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+        }
+        .color-option:hover { opacity: 0.8; }
+        .color-option.active::after {
+            content: '';
+            position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border: 2px solid #2383E2;
+            border-radius: 50%;
+        }
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 sidebar hidden md:flex flex-col p-3 gap-1 flex-shrink-0">
+        <div class="h-8 flex items-center px-2 font-semibold text-sm mb-4">FocusFlow</div>
+        <div class="px-3 py-1 text-sm bg-gray-200 rounded font-medium text-gray-700">➕ Crear Hábito</div>
+        <div class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded cursor-pointer">🏠 Dashboard</div>
+        <div class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded cursor-pointer">📊 Estadísticas</div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto relative">
+        
+        <header class="h-12 flex items-center justify-between px-8 sticky top-0 bg-white/95 backdrop-blur z-20 border-b border-transparent hover:border-gray-100 transition">
+            <div class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 cursor-pointer transition">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Volver al Dashboard</span>
+            </div>
+            <div class="flex gap-3">
+                <button class="text-sm font-medium text-gray-500 hover:bg-gray-100 px-3 py-1.5 rounded transition">Cancelar</button>
+                <button class="text-sm font-medium text-white bg-[#2383E2] hover:bg-[#1B74C9] px-4 py-1.5 rounded shadow-sm transition">Guardar Hábito</button>
+            </div>
+        </header>
+
+        <div class="max-w-3xl mx-auto px-8 py-10 pb-32">
+            
+            <div class="group relative w-fit mb-6 -ml-1">
+                <div class="text-7xl hover:bg-gray-100 p-2 rounded cursor-pointer transition select-none">✨</div>
+                <div class="absolute top-2 -right-12 opacity-0 group-hover:opacity-100 text-xs text-gray-400 bg-white border border-gray-200 px-1 rounded whitespace-nowrap">Cambiar icono</div>
+            </div>
+
+            <div class="mb-10">
+                <input type="text" 
+                       placeholder="Nombre del hábito" 
+                       class="w-full text-4xl font-bold placeholder-gray-300 border-none p-0 focus:ring-0 text-[#37352F] outline-none bg-transparent"
+                       autofocus>
+                <div class="text-gray-400 text-sm mt-2 flex items-center gap-2">
+                    <span>En:</span>
+                    <span class="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded text-xs text-gray-600 cursor-pointer hover:bg-gray-200">
+                        💼 Sin categoría <span class="text-[10px]">▼</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+
+                <div>
+                    <label class="notion-label">Descripción</label>
+                    <textarea class="notion-input resize-none" rows="3" placeholder="Describe tu rutina..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="notion-label">Categoría</label>
+                            <div class="relative">
+                                <select class="notion-input appearance-none bg-white cursor-pointer">
+                                    <option>💼 Productividad</option>
+                                    <option>🧘 Salud</option>
+                                    <option>🎨 Arte</option>
+                                </select>
+                                <div class="absolute right-3 top-3 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="notion-label">Frecuencia</label>
+                            <div class="relative">
+                                <select class="notion-input appearance-none bg-white cursor-pointer">
+                                    <option>Diario</option>
+                                    <option>Lunes a Viernes</option>
+                                </select>
+                                <div class="absolute right-3 top-3 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="notion-label">Dificultad (XP)</label>
+                            <div class="relative">
+                                <select class="notion-input appearance-none bg-white cursor-pointer">
+                                    <option>Medio (25 XP)</option>
+                                    <option>Fácil (10 XP)</option>
+                                    <option>Difícil (50 XP)</option>
+                                </select>
+                                <div class="absolute right-3 top-3 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="notion-label">Hora</label>
+                                <input type="time" class="notion-input" value="09:00">
+                            </div>
+                            <div>
+                                <label class="notion-label">Pomodoros</label>
+                                <input type="number" class="notion-input" value="1">
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <hr class="border-gray-100">
+
+                <div>
+                    <label class="notion-label">Seleccionar Icono de lista</label>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <div class="icon-box">🎯</div>
+                        <div class="icon-box">💪</div>
+                        <div class="icon-box">📚</div>
+                        <div class="icon-box">💻</div>
+                        <div class="icon-box">🏃</div>
+                        <div class="icon-box active">✨</div>
+                        <div class="icon-box">🎨</div>
+                        <div class="icon-box">🎵</div>
+                        <div class="icon-box">📝</div>
+                        <div class="icon-box text-xs text-gray-400 w-auto px-3 bg-gray-50 border border-gray-100 hover:bg-gray-100">Más...</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="notion-label">Color de Etiqueta</label>
+                    <div class="flex gap-4 mt-3 pl-1">
+                        <div class="color-option bg-[#EB5757]"></div>
+                        <div class="color-option bg-[#F2994A]"></div>
+                        <div class="color-option bg-[#F2C94C]"></div>
+                        <div class="color-option bg-[#27AE60]"></div>
+                        <div class="color-option bg-[#2383E2] active"></div>
+                        <div class="color-option bg-[#9B51E0]"></div>
+                        <div class="color-option bg-[#808080]"></div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <div class="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🔔</span>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">Activar Recordatorio</div>
+                                <div class="text-xs text-gray-500">Recibirás una notificación push.</div>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+            </div> </div>
+    </main>
+</body>
+</html>

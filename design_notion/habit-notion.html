@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Hábitos - Notion Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; color: #37352F; }
+        
+        /* Colores Pastel Notion para Covers */
+        .cover-blue { background-color: #E7F3F8; }
+        .cover-green { background-color: #EDF3EC; }
+        .cover-orange { background-color: #FAEBDD; }
+        .cover-purple { background-color: #F6F3F9; }
+        .cover-red { background-color: #FDEBEC; }
+
+        /* Estilos de Tarjeta */
+        .notion-card {
+            border: 1px solid #E9E9E7;
+            border-radius: 4px; /* Bordes menos redondeados que tu original */
+            overflow: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background: white;
+            cursor: pointer;
+        }
+        .notion-card:hover {
+            background-color: #FBFBFA; /* Hover sutil típico de Notion */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Inputs de búsqueda */
+        .notion-search {
+            border: 1px solid rgba(55, 53, 47, 0.16);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .notion-search:focus {
+            border-color: #2383E2;
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2);
+            outline: none;
+        }
+
+        /* Tabs de Vistas (Activos, Todos...) */
+        .view-tab {
+            padding: 6px 8px;
+            font-size: 14px;
+            color: #787774;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .view-tab:hover { background-color: #EFEFED; border-radius: 3px; }
+        .view-tab.active { color: #37352F; border-bottom-color: #37352F; border-radius: 0; }
+        .view-tab.active:hover { background-color: transparent; }
+
+        /* Badges / Etiquetas */
+        .badge { display: inline-flex; align-items: center; padding: 0 6px; border-radius: 3px; font-size: 12px; height: 20px; white-space: nowrap; }
+        .badge-gray { background: #E3E2E0; color: #32302C; }
+        .badge-green { background: #DBEDDB; color: #1C3829; }
+        .badge-orange { background: #FADEC9; color: #49290E; }
+        .badge-red { background: #FFE2DD; color: #5D1715; }
+
+        /* Botón de Estado dentro de la card */
+        .status-btn {
+            width: 100%;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            transition: 0.1s;
+        }
+        .status-completed { background: #EDF3EC; color: #18443B; border: 1px solid transparent; }
+        .status-completed:hover { background: #DBEDDB; }
+        
+        .status-pending { background: white; border: 1px solid #E9E9E7; color: #9B9A97; }
+        .status-pending:hover { background: #F7F7F5; color: #37352F; }
+
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <header class="max-w-6xl mx-auto px-6 pt-12 pb-6">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="text-4xl mb-4">💎</div>
+                <h1 class="text-4xl font-bold text-[#37352F]">Mis Hábitos</h1>
+                <p class="text-[#787774] mt-2 text-base">Gestiona y completa tus rutinas diarias.</p>
+            </div>
+            <button class="bg-[#2383E2] hover:bg-[#1B74C9] text-white px-4 py-2 rounded text-sm font-medium shadow-sm transition flex items-center gap-2">
+                <span>+</span> Nuevo Hábito
+            </button>
+        </div>
+
+        <div class="border-b border-[#E9E9E7] flex flex-col md:flex-row md:items-center justify-between gap-4 pb-0">
+            
+            <div class="flex items-center gap-1 overflow-x-auto">
+                <div class="view-tab active">
+                    <span>🗂️</span> Activos
+                </div>
+                <div class="view-tab">
+                    <span>📦</span> Archivados
+                </div>
+                <div class="view-tab">
+                    <span>📑</span> Todos
+                </div>
+                <div class="h-4 w-px bg-gray-200 mx-2 hidden md:block"></div>
+                <div class="flex items-center gap-1 text-sm text-[#37352F] hover:bg-[#EFEFED] px-2 py-1 rounded cursor-pointer transition">
+                    <span class="text-xs">📂</span> Por Categoría
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+            </div>
+
+            <div class="relative w-full md:w-64 mb-2 md:mb-0">
+                <span class="absolute left-2.5 top-2 text-gray-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                <input type="text" placeholder="Buscar..." class="notion-search w-full pl-8 py-1.5 bg-transparent text-[#37352F]">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div class="notion-card group relative">
+                <div class="h-20 cover-blue w-full relative">
+                    <div class="absolute -bottom-4 left-4 bg-white p-1 rounded shadow-sm text-2xl w-10 h-10 flex items-center justify-center">
+                        📧
+                    </div>
+                    <button class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-white rounded text-gray-500 opacity-0 group-hover:opacity-100 transition">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </button>
+                </div>
+
+                <div class="pt-6 px-4 pb-4">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-medium text-[#37352F] text-base truncate pr-2">Revisar emails</h3>
+                        <span class="badge badge-green text-[10px]">Fácil</span>
+                    </div>
+                    <p class="text-xs text-[#787774] mb-4 line-clamp-2">Revisar correos importantes y crear lista de tareas.</p>
+
+                    <div class="space-y-2 mb-4">
+                         <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">🔥</span>
+                            <span>Racha: 2 días</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">⚡</span>
+                            <span>10 XP</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">📅</span>
+                            <span class="badge badge-gray">Diario</span>
+                        </div>
+                    </div>
+
+                    <button class="status-btn status-completed flex items-center justify-center gap-2 cursor-default">
+                        <span>✓</span> Completado
+                    </button>
+                </div>
+            </div>
+
+            <div class="notion-card group relative">
+                <div class="h-20 cover-green w-full relative">
+                    <div class="absolute -bottom-4 left-4 bg-white p-1 rounded shadow-sm text-2xl w-10 h-10 flex items-center justify-center">
+                        🏃‍♂️
+                    </div>
+                    <button class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-white rounded text-gray-500 opacity-0 group-hover:opacity-100 transition">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </button>
+                </div>
+
+                <div class="pt-6 px-4 pb-4">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-medium text-[#37352F] text-base truncate pr-2">Hacer ejercicio</h3>
+                        <span class="badge badge-orange text-[10px]">Medio</span>
+                    </div>
+                    <p class="text-xs text-[#787774] mb-4 line-clamp-2">Rutina de cardio, pesas o yoga por la mañana.</p>
+
+                    <div class="space-y-2 mb-4">
+                         <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">🔥</span>
+                            <span>Racha: 2 días</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">⚡</span>
+                            <span>25 XP</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">📅</span>
+                            <span class="badge badge-gray">Diario</span>
+                        </div>
+                    </div>
+
+                    <button class="status-btn status-completed flex items-center justify-center gap-2 cursor-default">
+                        <span>✓</span> Completado
+                    </button>
+                </div>
+            </div>
+
+            <div class="notion-card group relative">
+                <div class="h-20 cover-orange w-full relative">
+                    <div class="absolute -bottom-4 left-4 bg-white p-1 rounded shadow-sm text-2xl w-10 h-10 flex items-center justify-center">
+                        🧹
+                    </div>
+                    <button class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-white rounded text-gray-500 opacity-0 group-hover:opacity-100 transition">
+                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </button>
+                </div>
+
+                <div class="pt-6 px-4 pb-4">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-medium text-[#37352F] text-base truncate pr-2">Limpiar la cocina</h3>
+                        <span class="badge badge-orange text-[10px]">Medio</span>
+                    </div>
+                    <p class="text-xs text-[#787774] mb-4 line-clamp-2">Limpieza profunda de cocina, refri y despensa.</p>
+
+                    <div class="space-y-2 mb-4">
+                         <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">🔥</span>
+                            <span>Racha: 0 días</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">⚡</span>
+                            <span>25 XP</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">📅</span>
+                            <span class="badge badge-gray">Semanal</span>
+                        </div>
+                    </div>
+
+                    <button class="status-btn status-pending flex items-center justify-center gap-2">
+                        <span class="text-xs">○</span> No programado hoy
+                    </button>
+                </div>
+            </div>
+
+            <div class="notion-card group relative">
+                <div class="h-20 cover-purple w-full relative">
+                    <div class="absolute -bottom-4 left-4 bg-white p-1 rounded shadow-sm text-2xl w-10 h-10 flex items-center justify-center">
+                        🧠
+                    </div>
+                    <button class="absolute top-2 right-2 p-1 bg-white/50 hover:bg-white rounded text-gray-500 opacity-0 group-hover:opacity-100 transition">
+                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </button>
+                </div>
+
+                <div class="pt-6 px-4 pb-4">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-medium text-[#37352F] text-base truncate pr-2">Practicar algoritmos</h3>
+                        <span class="badge badge-red text-[10px]">Difícil</span>
+                    </div>
+                    <p class="text-xs text-[#787774] mb-4 line-clamp-2">Resolver problemas de LeetCode, HackerRank o similar.</p>
+
+                    <div class="space-y-2 mb-4">
+                         <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">🔥</span>
+                            <span>Racha: 0 días</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">⚡</span>
+                            <span>50 XP</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-[#37352F]">
+                            <span class="opacity-40 w-4 text-center">📅</span>
+                            <span class="badge badge-gray">Semanal</span>
+                        </div>
+                    </div>
+
+                    <button class="status-btn status-pending flex items-center justify-center gap-2">
+                        <span class="text-xs">○</span> No programado hoy
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

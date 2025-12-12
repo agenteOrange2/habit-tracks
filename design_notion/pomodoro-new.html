@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Focus Dashboard - Notion Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; color: #37352F; }
+
+        /* UTILIDADES NOTION */
+        .notion-border { border: 1px solid #E9E9E7; }
+        .notion-bg-hover:hover { background-color: #F7F7F5; }
+        .text-gray-notion { color: #9B9A97; }
+        
+        /* INPUTS ESTILO PROPIEDAD (Sin borde hasta hover/focus) */
+        .prop-input {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 2px 6px;
+            color: #37352F;
+            font-size: 14px;
+            text-align: right;
+            transition: all 0.2s;
+            width: 60px;
+        }
+        .prop-input:hover { background-color: #EFEFED; }
+        .prop-input:focus { 
+            background-color: white; 
+            border-color: #2383E2; 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
+        }
+
+        /* TOGGLE SWITCH (Estilo iOS pequeño de Notion) */
+        .notion-toggle {
+            position: relative; display: inline-block; width: 32px; height: 18px;
+        }
+        .notion-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #E3E2E0; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px;
+            background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        input:checked + .slider { background-color: #2383E2; }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #E3E2E0; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <header class="sticky top-0 bg-white/95 backdrop-blur z-20 border-b border-[#E9E9E7] px-6 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-xl">🍅</span>
+                <span class="font-semibold text-[#37352F]">Focus Room</span>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-[#F7F7F5] px-3 py-1.5 rounded border border-[#E9E9E7]">
+                <span class="text-xs font-bold text-[#9B9A97] uppercase tracking-wide">Energía</span>
+                <div class="w-32 h-2 bg-[#E3E2E0] rounded-full overflow-hidden">
+                    <div class="h-full bg-[#27AE60] w-[90%] rounded-full"></div>
+                </div>
+                <span class="text-xs font-mono text-[#37352F]">90/100</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="lg:col-span-8 space-y-6">
+
+            <div class="border border-[#E9E9E7] rounded-md p-8 flex flex-col items-center justify-center relative bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                
+                <div class="absolute top-4 left-4 right-4 flex justify-center">
+                    <div class="flex items-center gap-2 px-3 py-1.5 hover:bg-[#F7F7F5] rounded cursor-pointer transition text-[#37352F] group border border-transparent hover:border-[#E9E9E7]">
+                        <span class="text-gray-400 text-xs mr-1 group-hover:hidden">Hábito:</span>
+                        <span class="text-lg">💻</span>
+                        <span class="font-medium text-sm border-b border-gray-300 border-dashed pb-0.5">Sin hábito específico</span>
+                        <svg class="w-3 h-3 text-gray-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <div class="relative mt-8 mb-8">
+                    <svg class="w-72 h-72 transform -rotate-90">
+                        <circle cx="144" cy="144" r="136" stroke="#F1F1EF" stroke-width="4" fill="transparent" />
+                        <circle cx="144" cy="144" r="136" stroke="#EB5757" stroke-width="4" fill="transparent" 
+                                stroke-dasharray="854" stroke-dashoffset="0" stroke-linecap="round" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-8xl font-bold text-[#37352F] tracking-tighter tabular-nums mb-2">24:56</div>
+                        <span class="bg-[#E7F3F8] text-[#154664] px-2 py-0.5 rounded text-xs font-medium">Listo para comenzar</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mb-8">
+                    <button class="px-3 py-1 text-xs font-medium text-[#37352F] bg-[#F7F7F5] hover:bg-[#EFEFED] rounded border border-[#E9E9E7] transition">15 min</button>
+                    <button class="px-3 py-1 text-xs font-medium text-white bg-[#2383E2] rounded shadow-sm border border-transparent transition">25 min</button>
+                    <button class="px-3 py-1 text-xs font-medium text-[#37352F] bg-[#F7F7F5] hover:bg-[#EFEFED] rounded border border-[#E9E9E7] transition">50 min</button>
+                    <button class="px-3 py-1 text-xs font-medium text-gray-400 hover:text-[#37352F] hover:bg-[#F7F7F5] rounded transition">+ Custom</button>
+                </div>
+
+                <button class="bg-[#2383E2] hover:bg-[#1B74C9] text-white text-base font-medium px-10 py-2.5 rounded shadow-sm transition active:scale-95 flex items-center gap-2">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    Iniciar Pomodoro
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="border border-[#E9E9E7] rounded-md p-4 bg-white">
+                    <div class="text-[11px] font-bold text-[#9B9A97] uppercase tracking-wide mb-3">Ciclo Actual</div>
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="flex gap-2">
+                            <div class="w-4 h-4 rounded-full border border-[#E9E9E7] bg-gray-50"></div>
+                            <div class="w-4 h-4 rounded-full border border-[#E9E9E7] bg-gray-50"></div>
+                            <div class="w-4 h-4 rounded-full border border-[#E9E9E7] bg-gray-50"></div>
+                            <div class="w-4 h-4 rounded-full border border-[#E9E9E7] bg-gray-50"></div>
+                        </div>
+                        <div class="text-sm text-[#37352F]"><span class="font-bold">0</span> / 4</div>
+                        <div class="text-[10px] text-[#27AE60] bg-[#DDEDEA] px-1.5 py-0.5 rounded">Próximo: Descanso Corto (5m)</div>
+                    </div>
+                </div>
+
+                <div class="border border-[#E9E9E7] rounded-md p-4 bg-[#FFFBF0] relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3 relative z-10">
+                        <div class="text-[11px] font-bold text-[#9A6D02] uppercase tracking-wide">Meta Diaria</div>
+                        <span class="text-xs font-mono text-[#9A6D02]">0%</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="text-3xl font-bold text-[#37352F]">0<span class="text-lg text-[#9B9A97] font-normal">/4</span></div>
+                        <span class="text-2xl">💪</span>
+                    </div>
+                    
+                    <div class="absolute bottom-0 left-0 h-1.5 bg-[#FBF3DB] w-full">
+                        <div class="h-full bg-[#F2C94C] w-[0%]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#E9E9E7] rounded-md bg-white overflow-hidden">
+                <div class="px-4 py-2 border-b border-[#E9E9E7] bg-[#FBFBFA] flex items-center gap-4 overflow-x-auto">
+                    <span class="text-xs font-bold text-[#37352F]">📋 Historial</span>
+                    <div class="h-4 w-px bg-gray-300"></div>
+                    <button class="text-xs bg-white border border-[#E9E9E7] px-2 py-1 rounded text-[#37352F] hover:bg-[#F7F7F5] active:bg-[#EFEFED]">Todas</button>
+                    <button class="text-xs text-[#9B9A97] hover:text-[#37352F] px-2">Completadas</button>
+                    <button class="text-xs text-[#9B9A97] hover:text-[#37352F] px-2">Interrumpidas</button>
+                </div>
+
+                <table class="w-full text-left">
+                    <thead class="text-[10px] text-[#9B9A97] uppercase bg-white border-b border-[#E9E9E7]">
+                        <tr>
+                            <th class="px-4 py-2 font-medium">Hábito</th>
+                            <th class="px-4 py-2 font-medium w-24">Estado</th>
+                            <th class="px-4 py-2 font-medium w-24 text-right">Duración</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-[#F1F1EF]">
+                        <tr>
+                            <td colspan="3" class="px-4 py-8 text-center text-gray-400 text-xs">
+                                <div class="text-xl mb-2">🍅</div>
+                                No hay sesiones hoy. ¡Empieza una!
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-4 space-y-6">
+
+            <div class="border border-[#E9E9E7] rounded-md bg-white p-5">
+                <div class="flex items-center gap-2 mb-4 pb-2 border-b border-[#E9E9E7]">
+                    <span class="text-lg">⚙️</span>
+                    <h3 class="text-xs font-bold text-[#9B9A97] uppercase tracking-wide">Configuración</h3>
+                </div>
+
+                <div class="space-y-0.5">
+                    
+                    <div class="flex items-center justify-between py-2 hover:bg-[#F7F7F5] rounded px-2 -mx-2 transition">
+                        <div class="flex items-center gap-2 text-sm text-[#37352F]">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Descanso Corto (min)
+                        </div>
+                        <input type="number" value="5" class="prop-input" min="1" max="30">
+                    </div>
+
+                    <div class="flex items-center justify-between py-2 hover:bg-[#F7F7F5] rounded px-2 -mx-2 transition">
+                        <div class="flex items-center gap-2 text-sm text-[#37352F]">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            Descanso Largo (min)
+                        </div>
+                        <input type="number" value="15" class="prop-input" min="5" max="60">
+                    </div>
+
+                    <div class="h-2"></div> <div class="flex items-center justify-between py-2 hover:bg-[#F7F7F5] rounded px-2 -mx-2 transition">
+                        <div class="text-sm text-[#37352F]">Auto-iniciar descansos</div>
+                        <label class="notion-toggle">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-2 hover:bg-[#F7F7F5] rounded px-2 -mx-2 transition">
+                        <div class="text-sm text-[#37352F]">Sonidos habilitados</div>
+                        <label class="notion-toggle">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#E9E9E7] rounded-md bg-white p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-bold text-[#9B9A97] uppercase tracking-wide">Estadísticas</h3>
+                    <span class="text-xs text-[#2383E2] cursor-pointer hover:underline">Ver más</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-[#F7F7F5] rounded p-3">
+                        <div class="text-2xl font-bold text-[#37352F]">0</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Pomodoros Hoy</div>
+                    </div>
+                    <div class="bg-[#F7F7F5] rounded p-3">
+                        <div class="text-2xl font-bold text-[#37352F]">0</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Minutos</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex gap-3 p-3 bg-white border border-[#E9E9E7] rounded shadow-sm">
+                    <span class="text-xl">💡</span>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Aún no has completado ningún Pomodoro hoy. ¡Es momento de comenzar!
+                    </p>
+                </div>
+            </div>
+
+            <button class="w-full text-center text-xs text-gray-400 hover:text-[#37352F] hover:bg-[#F7F7F5] py-2 rounded transition">
+                ← Volver al Dashboard
+            </button>
+
+        </div>
+    </main>
+
+</body>
+</html>

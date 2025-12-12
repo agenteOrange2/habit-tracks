@@ -16,8 +16,14 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
+            
+            // Old enum fields (kept for backward compatibility)
             $table->string('category');
             $table->string('difficulty')->default('medium');
+            
+            // New dynamic relationship fields
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->foreignId('difficulty_id')->nullable()->constrained('difficulties')->nullOnDelete();
             
             // Recurrencia
             $table->string('frequency')->default('daily');

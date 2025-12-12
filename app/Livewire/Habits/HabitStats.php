@@ -46,6 +46,6 @@ class HabitStats extends Component
     public function render()
     {
         return view('livewire.habits.habit-stats')
-            ->layout('layouts.app');
+            ->layout('components.layouts.app');
     }
 }

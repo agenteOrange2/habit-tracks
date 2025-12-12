@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
+@import './retro.css';
+@import './note-editor.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -27,6 +29,12 @@
     --color-primary-100: #e0e7ff;
     --color-primary-600: #4f46e5;
     --color-primary-700: #4338ca;
+
+    --color-brand-50: #eff6ff;
+    --color-brand-100: #dbeafe;
+    --color-brand-500: #3b82f6;
+    --color-brand-600: #2563eb;
+    --color-brand-700: #1d4ed8;
 
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);

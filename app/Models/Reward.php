@@ -42,7 +42,7 @@ class Reward extends Model
         return $this->claims()->count();
     }
 
-    public function canBeClaimed(User $user): boo
+    public function canBeClaimed(User $user): bool
     {
         return $this->is_available && $user->stats->available_points >= $this->cost_points;
     }

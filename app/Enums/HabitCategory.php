@@ -68,4 +68,18 @@ enum HabitCategory: string
             self::PERSONAL => 'bg-orange-500',
         };
     }
+    
+    public function textClass(): string
+    {
+        return match($this) {
+            self::PRODUCTIVITY => 'text-blue-600',
+            self::HEALTH => 'text-green-600',
+            self::LEARNING => 'text-purple-600',
+            self::SOCIAL => 'text-yellow-600',
+            self::CREATIVE => 'text-pink-600',
+            self::HOUSEHOLD => 'text-indigo-600',
+            self::FINANCE => 'text-teal-600',
+            self::PERSONAL => 'text-orange-600',
+        };
+    }
 }

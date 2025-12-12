@@ -15,4 +15,19 @@ export default defineConfig({
     server: {
         cors: true,
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Split vendor code into separate chunk
+                    'vendor': ['lucide'],
+                }
+            }
+        },
+        // Increase chunk size warning limit
+        chunkSizeWarningLimit: 600,
+        // Enable minification with esbuild (faster and included by default)
+        minify: 'esbuild',
+        target: 'es2015'
+    }
 });

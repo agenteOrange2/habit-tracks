@@ -20,6 +20,11 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->boolean('was_interrupted')->default(false);
             $table->timestamps();
+
+            // Indexes for performance
+            $table->index(['user_id', 'started_at']);
+            $table->index(['user_id', 'completed_at']);
+            $table->index('was_interrupted');
         });
     }
 

@@ -36,7 +36,7 @@ class CreateEntry extends Component
 
         session()->flash('success', '¡Entrada de diario guardada! 📝');
 
-        return $this->redirect(route('journal.index'), navigate: true);
+        return $this->redirect(route('admin.journal.index'), navigate: true);
     }
 
     public function render()

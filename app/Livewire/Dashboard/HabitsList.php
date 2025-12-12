@@ -29,14 +29,14 @@ class HabitsList extends Component
                 return collect([]);
             }
             
-            return $user->habits()
+            $allHabits = $user->habits()
                 ->where('is_active', true)
                 ->with([
-                    'logs' => fn($q) => $q->whereDate('completed_date', today()),
-                    'category'
+                    'logs' => fn($q) => $q->whereDate('completed_date', today())
                 ])
-                ->get()
-                ->filter(fn($habit) => $habit->isScheduledForToday());
+                ->get();
+            
+            return $allHabits->filter(fn($habit) => $habit->isScheduledForToday());
                 
         } catch (\Exception $e) {
             Log::error('Failed to load today\'s habits', [
@@ -56,22 +56,117 @@ class HabitsList extends Component
         if ($habit->user_id !== Auth::id()) {
             $this->dispatch('notification', [
                 'type' => 'error',
-                'message' => 'No tienes permiso para completar este hábito.'
+                'message' => 'No tienes permiso para modificar este hábito.'
             ]);
             return;
         }
 
         // Check if already completed today
         if ($habit->isCompletedToday()) {
+            // Uncomplete the habit
+            $this->uncompleteHabit($habitId);
+        } else {
+            // Complete the habit
+            $this->completeHabit($habitId);
+        }
+    }
+
+    public function uncompleteHabit(int $habitId): void
+    {
+        try {
+            DB::transaction(function () use ($habitId) {
+                $habit = Habit::findOrFail($habitId);
+                $user = Auth::user();
+                
+                // Verify habit belongs to user
+                if ($habit->user_id !== $user->id) {
+                    throw new \Exception('Unauthorized habit access');
+                }
+                
+                // Find and delete today's log
+                $log = HabitLog::where('habit_id', $habit->id)
+                    ->where('user_id', $user->id)
+                    ->whereDate('completed_date', today())
+                    ->first();
+                
+                if (!$log) {
+                    throw new \Exception('No completion log found for today');
+                }
+                
+                // Remove points that were awarded
+                $pointsToRemove = $log->points_earned ?? $habit->points_reward;
+                $user->stats()->decrement('total_points', $pointsToRemove);
+                
+                // Remove XP from user level
+                $userLevel = $user->level;
+                if ($userLevel) {
+                    // Decrease current XP
+                    $newCurrentXp = max(0, $userLevel->current_xp - $pointsToRemove);
+                    $userLevel->current_xp = $newCurrentXp;
+                    
+                    // Decrease total XP
+                    $userLevel->total_xp = max(0, $userLevel->total_xp - $pointsToRemove);
+                    
+                    // Check if we need to level down
+                    while ($userLevel->current_level > 1 && $newCurrentXp < 0) {
+                        $userLevel->current_level--;
+                        $previousLevelXp = ($userLevel->current_level) * 100;
+                        $newCurrentXp += $previousLevelXp;
+                    }
+                    
+                    $userLevel->current_xp = max(0, $newCurrentXp);
+                    $userLevel->save();
+                }
+                
+                // Delete the log
+                $log->delete();
+                
+                // Update habit streak only (not global streak)
+                $streakService = app(StreakService::class);
+                $streakService->updateStreak($habit);
+            });
+            
+            // Refresh habits list
+            $this->habits = $this->loadTodayHabits();
+            
+            // Force component refresh
+            $this->dispatch('$refresh');
+            
+            // Dispatch success event
+            $this->dispatch('habitUncompleted');
             $this->dispatch('notification', [
                 'type' => 'info',
-                'message' => 'Este hábito ya fue completado hoy.'
+                'message' => 'Hábito desmarcado. Los puntos han sido revertidos.'
             ]);
-            return;
+            
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Habit not found for uncomplete', [
+                'habit_id' => $habitId,
+                'user_id' => Auth::id(),
+            ]);
+            
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'El hábito no existe.'
+            ]);
+            
+            $this->habits = $this->loadTodayHabits();
+            
+        } catch (\Exception $e) {
+            Log::error('Habit uncompletion failed', [
+                'habit_id' => $habitId,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'No se pudo desmarcar el hábito. Intenta de nuevo.'
+            ]);
+            
+            $this->habits = $this->loadTodayHabits();
         }
-
-        // Complete the habit
-        $this->completeHabit($habitId);
     }
 
     public function completeHabit(int $habitId): void
@@ -105,10 +200,9 @@ class HabitsList extends Component
                 $pointsService = app(PointsService::class);
                 $pointsAwarded = $pointsService->awardPoints($user, $habit, 0, false);
                 
-                // Update streaks
+                // Update habit streak only (not global streak - that updates at day change)
                 $streakService = app(StreakService::class);
                 $streakService->updateStreak($habit);
-                $streakService->updateGlobalStreak($user);
                 
                 // Check achievements
                 $achievementService = app(AchievementService::class);
@@ -121,6 +215,9 @@ class HabitsList extends Component
             
             // Refresh habits list
             $this->habits = $this->loadTodayHabits();
+            
+            // Force component refresh
+            $this->dispatch('$refresh');
             
             // Dispatch success event
             $this->dispatch('habitCompleted');

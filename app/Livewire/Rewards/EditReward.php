@@ -5,16 +5,18 @@ namespace App\Livewire\Rewards;
 use Livewire\Component;
 use App\Models\Reward;
 use App\Enums\RewardCategory;
+use Illuminate\Validation\Rule;
 
 class EditReward extends Component
 {
     public Reward $reward;
-    public $name;
-    public $description;
-    public $category;
-    public $cost_points;
-    public $icon;
-    public $is_available;
+    public string $name = '';
+    public string $description = '';
+    public string $category = '';
+    public int $cost_points = 1;
+    public string $icon = '🎁';
+    public bool $is_available = true;
+    public bool $showDeleteConfirmation = false;
 
     public function mount(Reward $reward): void
     {
@@ -22,8 +24,8 @@ class EditReward extends Component
 
         $this->reward = $reward;
         $this->name = $reward->name;
-        $this->description = $reward->description;
-        $this->category = $reward->category;
+        $this->description = $reward->description ?? '';
+        $this->category = $reward->category->value;
         $this->cost_points = $reward->cost_points;
         $this->icon = $reward->icon;
         $this->is_available = $reward->is_available;
@@ -31,32 +33,63 @@ class EditReward extends Component
 
     protected function rules(): array
     {
+        $validCategories = array_column(RewardCategory::cases(), 'value');
+        
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|min:3|max:100',
             'description' => 'nullable|string|max:500',
-            'category' => 'required|string',
+            'category' => ['required', 'string', Rule::in($validCategories)],
             'cost_points' => 'required|integer|min:1',
-            'icon' => 'required|string',
+            'icon' => 'required|string|max:10',
             'is_available' => 'boolean',
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'name.required' => 'El nombre de la recompensa es obligatorio.',
+            'name.min' => 'El nombre debe tener al menos 3 caracteres.',
+            'name.max' => 'El nombre no puede exceder 100 caracteres.',
+            'description.max' => 'La descripción no puede exceder 500 caracteres.',
+            'category.required' => 'Debes seleccionar una categoría.',
+            'category.in' => 'La categoría seleccionada no es válida.',
+            'cost_points.required' => 'El costo en puntos es obligatorio.',
+            'cost_points.integer' => 'El costo debe ser un número entero.',
+            'cost_points.min' => 'El costo debe ser al menos 1 punto.',
+            'icon.required' => 'El icono es obligatorio.',
+            'icon.max' => 'El icono no puede exceder 10 caracteres.',
         ];
     }
 
     public function update(): void
     {
-        $this->validate();
+        $this->authorize('update', $this->reward);
+        
+        $validated = $this->validate();
 
         $this->reward->update([
-            'name' => $this->name,
-            'description' => $this->description,
-            'category' => $this->category,
-            'cost_points' => $this->cost_points,
-            'icon' => $this->icon,
-            'is_available' => $this->is_available,
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category' => $validated['category'],
+            'cost_points' => $validated['cost_points'],
+            'icon' => $validated['icon'],
+            'is_available' => $validated['is_available'],
         ]);
 
-        session()->flash('success', '¡Recompensa actualizada exitosamente! ✅');
+        session()->flash('success', '✅ ¡Recompensa actualizada exitosamente!');
 
-        return $this->redirect(route('rewards.index'), navigate: true);
+        $this->redirect(route('rewards.index'), navigate: true);
+    }
+
+    public function confirmDelete(): void
+    {
+        $this->showDeleteConfirmation = true;
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->showDeleteConfirmation = false;
     }
 
     public function delete(): void
@@ -65,15 +98,15 @@ class EditReward extends Component
 
         $this->reward->delete();
 
-        session()->flash('success', 'Recompensa eliminada correctamente.');
+        session()->flash('success', '🗑️ Recompensa eliminada correctamente.');
 
-        return $this->redirect(route('rewards.index'), navigate: true);
+        $this->redirect(route('rewards.index'), navigate: true);
     }
 
     public function render()
     {
         return view('livewire.rewards.edit-reward', [
             'categories' => RewardCategory::cases(),
-        ])->layout('layouts.app');
+        ])->layout('components.layouts.app');
     }
 }

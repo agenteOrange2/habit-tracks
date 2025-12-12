@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Focus - Notion Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; color: #37352F; }
+        
+        /* Colores Notion */
+        .notion-border { border: 1px solid #E9E9E7; }
+        .notion-hover:hover { background-color: #F7F7F5; }
+        .text-notion-gray { color: #9B9A97; }
+        
+        /* Barra de Energía */
+        .energy-bar-bg { background-color: #F1F1EF; }
+        .energy-bar-fill { background-color: #F2C94C; } /* Amarillo Notion */
+
+        /* Anillo del Timer (SVG Animación) */
+        .timer-ring {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <aside class="w-64 bg-[#F7F7F5] border-r border-[#E9E9E7] hidden md:flex flex-col p-3 flex-shrink-0">
+        <div class="h-8 flex items-center px-2 font-semibold text-sm mb-4">FocusFlow</div>
+        <div class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded cursor-pointer">🏠 Dashboard</div>
+        <div class="px-3 py-1 text-sm bg-gray-200 rounded font-medium text-gray-700">🍅 Pomodoro Zone</div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-y-auto">
+
+        <header class="h-14 flex items-center justify-between px-8 border-b border-transparent sticky top-0 z-10">
+            <div class="flex items-center text-sm gap-2 text-[#37352F]">
+                <span class="opacity-50 cursor-pointer hover:underline">Herramientas</span>
+                <span class="opacity-30">/</span>
+                <span class="font-medium flex items-center gap-1">⏱️ Focus Timer</span>
+            </div>
+
+            <div class="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-[#F7F7F5] transition cursor-help group relative">
+                <div class="text-xs font-medium text-[#37352F]">ENERGÍA</div>
+                <div class="w-24 h-2 energy-bar-bg rounded-full overflow-hidden">
+                    <div class="h-full energy-bar-fill w-[80%] rounded-full"></div>
+                </div>
+                <span class="text-xs font-mono text-gray-500">80/100</span>
+                
+                <div class="absolute top-full right-0 mt-2 w-48 bg-gray-800 text-white text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition z-20">
+                    Costo por sesión: <span class="text-[#F2C94C] font-bold">-10 ⚡</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-6 py-10">
+
+            <div class="w-full mb-10 animate-fade-in-up">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <span class="text-sm text-notion-gray uppercase tracking-wide font-semibold">Trabajando en</span>
+                </div>
+                
+                <div class="relative group cursor-pointer w-full max-w-md mx-auto">
+                    <div class="flex items-center justify-between p-2 pl-3 rounded hover:bg-[#F7F7F5] transition border border-transparent hover:border-[#E9E9E7]">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">💻</span>
+                            <span class="text-lg font-medium border-b border-gray-300 border-dashed pb-0.5">Estudiar Programación</span>
+                        </div>
+                        <span class="text-xs text-gray-400">Cambiar ▾</span>
+                    </div>
+
+                    <div class="flex justify-center gap-4 mt-2 text-xs text-gray-400">
+                        <span class="flex items-center gap-1 bg-[#F1F1EF] px-1.5 py-0.5 rounded text-[#37352F]">
+                            🍅 Est: 2
+                        </span>
+                        <span class="flex items-center gap-1">
+                            🎯 Objetivo: 50 min
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative mb-12">
+                <svg class="w-80 h-80 transform -rotate-90">
+                    <circle cx="160" cy="160" r="150" stroke="#F1F1EF" stroke-width="4" fill="none" />
+                    <circle cx="160" cy="160" r="150" stroke="#EB5757" stroke-width="4" fill="none" 
+                            stroke-dasharray="942" stroke-dashoffset="0" stroke-linecap="round" 
+                            class="timer-ring transition-all duration-1000 ease-linear" />
+                </svg>
+                
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div class="text-[6rem] font-bold text-[#37352F] tracking-tighter leading-none font-inter tabular-nums">
+                        25:00
+                    </div>
+                    <div class="text-gray-400 mt-2 text-sm font-medium tracking-wide">ENFOQUE</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="px-6 py-3 rounded text-gray-500 hover:bg-[#F7F7F5] hover:text-gray-800 transition font-medium">
+                    Reiniciar
+                </button>
+
+                <button class="bg-[#2383E2] hover:bg-[#1B74C9] text-white text-lg font-medium px-10 py-3 rounded shadow-lg transform active:scale-95 transition flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Iniciar Focus
+                </button>
+            </div>
+
+            <div class="mt-6 hidden">
+                <div class="flex items-center gap-2 text-amber-600 bg-[#FBF3DB] px-3 py-2 rounded text-sm border border-[#F9E0A4]">
+                    <span>⚡</span> Energía insuficiente. Necesitas descansar.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="border-t border-[#E9E9E7] bg-[#FBFBFA] p-6">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-xs font-bold text-[#9B9A97] uppercase tracking-wide mb-3 px-2">Sesiones de Hoy</h3>
+                
+                <div class="bg-white border border-[#E9E9E7] rounded-sm overflow-hidden">
+                    <div class="flex items-center justify-between p-3 border-b border-[#E9E9E7] hover:bg-[#F7F7F5] transition">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">💻</span>
+                            <div>
+                                <div class="text-sm font-medium text-[#37352F]">Estudiar Programación</div>
+                                <div class="text-xs text-gray-400">09:00 AM · 25 min</div>
+                            </div>
+                        </div>
+                        <span class="bg-[#DDEDEA] text-[#18443B] text-[10px] uppercase font-bold px-2 py-0.5 rounded">Completado</span>
+                    </div>
+                     <div class="flex items-center justify-between p-3 hover:bg-[#F7F7F5] transition">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">📚</span>
+                            <div>
+                                <div class="text-sm font-medium text-[#37352F]">Leer Documentación</div>
+                                <div class="text-xs text-gray-400">10:15 AM · 12 min</div>
+                            </div>
+                        </div>
+                        <span class="bg-[#FBE4E4] text-[#6E2320] text-[10px] uppercase font-bold px-2 py-0.5 rounded">Interrumpido</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Simulación visual del anillo
+        const ring = document.querySelector('.timer-ring');
+        const total = 942; // Circumference
+        let progress = total;
+        
+        // Simular progreso al hacer click en Iniciar (solo visual)
+        document.querySelector('button.bg-\\[\\#2383E2\\]').addEventListener('click', () => {
+            setInterval(() => {
+                progress -= 5;
+                if(progress < 0) progress = total;
+                ring.style.strokeDashoffset = total - progress;
+            }, 100);
+        });
+    </script>
+</body>
+</html>

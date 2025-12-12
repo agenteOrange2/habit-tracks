@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Auth;
 class StatsCards extends Component
 {
     #[On('habitCompleted')]
+    #[On('habitUncompleted')]
     public function refreshStats()
     {
-        // Clear cached computed properties when a habit is completed
+        // Clear cached computed properties when a habit is completed or uncompleted
         unset($this->userLevel);
         unset($this->userStats);
         unset($this->currentStreak);
@@ -45,8 +46,7 @@ class StatsCards extends Component
         $todayHabits = $user->habits()
             ->where('is_active', true)
             ->with([
-                'logs' => fn($q) => $q->whereDate('completed_date', today()),
-                'category'
+                'logs' => fn($q) => $q->whereDate('completed_date', today())
             ])
             ->get()
             ->filter(fn($habit) => $habit->isScheduledForToday());

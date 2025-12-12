@@ -5,6 +5,8 @@ namespace App\Livewire\Habits;
 
 use Livewire\Component;
 use App\Models\Habit;
+use App\Models\Category;
+use App\Models\Difficulty;
 use App\Enums\{HabitDifficulty, HabitFrequency, HabitCategory};
 use Illuminate\Support\Facades\Auth;
 
@@ -12,8 +14,8 @@ class CreateHabit extends Component
 {
     public $name = '';
     public $description = '';
-    public $category = 'productivity';
-    public $difficulty = 'medium';
+    public $category_id = null;
+    public $difficulty_id = null;
     public $frequency = 'daily';
     public $selectedDays = [];
     public $time = '09:00';
@@ -28,8 +30,8 @@ class CreateHabit extends Component
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'category' => 'required|string',
-            'difficulty' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'difficulty_id' => 'required|exists:difficulties,id',
             'frequency' => 'required|string',
             'selectedDays' => 'array',
             'time' => 'nullable|date_format:H:i',
@@ -37,52 +39,61 @@ class CreateHabit extends Component
             'icon' => 'required|string',
             'estimated_pomodoros' => 'nullable|integer|min:1',
             'reminder_enabled' => 'boolean',
-            'reminder_time' => 'nullable|date_format:H:i',
+            'reminder_time' => $this->reminder_enabled ? 'required|date_format:H:i' : 'nullable',
         ];
     }
 
-    public function save(): void
+    public function save()
     {
         $this->validate();
 
         $schedule = null;
-        if ($this->frequency === 'weekly') {
+        if ($this->frequency === 'weekly' || $this->frequency === 'custom') {
             $schedule = [
                 'days' => $this->selectedDays,
                 'time' => $this->time,
             ];
         }
 
-        $difficulty = HabitDifficulty::from($this->difficulty);
+        // Get category and difficulty to retrieve data
+        $category = Category::findOrFail($this->category_id);
+        $difficulty = Difficulty::findOrFail($this->difficulty_id);
 
         $habit = Auth::user()->habits()->create([
             'name' => $this->name,
             'description' => $this->description,
-            'category' => $this->category,
-            'difficulty' => $this->difficulty,
+            // New dynamic fields
+            'category_id' => $this->category_id,
+            'difficulty_id' => $this->difficulty_id,
+            // Old enum fields (for backward compatibility during transition)
+            'category' => $category->slug,
+            'difficulty' => $difficulty->slug,
             'frequency' => $this->frequency,
             'schedule' => $schedule,
             'is_recurring' => true,
-            'points_reward' => $difficulty->points(),
+            'is_active' => true,
+            'points_reward' => $difficulty->points,
             'color' => $this->color,
             'icon' => $this->icon,
             'estimated_pomodoros' => $this->estimated_pomodoros,
             'reminder_enabled' => $this->reminder_enabled,
-            'reminder_time' => $this->reminder_time,
+            'reminder_time' => $this->reminder_enabled && !empty($this->reminder_time) ? $this->reminder_time : null,
         ]);
 
         $this->dispatch('habitCreated');
 
         session()->flash('success', '¡Hábito creado exitosamente! 🎉');
 
-        return $this->redirect(route('habits.index'), navigate: true);
+        return $this->redirect(route('admin.habits.index'), navigate: true);
     }
 
     public function render()
     {
+        // Load only active categories and difficulties from database
+        // Ordered by their display order
         return view('livewire.habits.create-habit', [
-            'categories' => HabitCategory::cases(),
-            'difficulties' => HabitDifficulty::cases(),
+            'categories' => Category::active()->ordered()->get(),
+            'difficulties' => Difficulty::active()->ordered()->get(),
             'frequencies' => HabitFrequency::cases(),
             'daysOfWeek' => [
                 0 => 'Domingo',
@@ -93,6 +104,6 @@ class CreateHabit extends Component
                 5 => 'Viernes',
                 6 => 'Sábado',
             ],
-        ])->layout('layouts.app');
+        ])->layout('components.layouts.app');
     }
 }

@@ -32,6 +32,18 @@ class PointsService
         // XP = puntos
         $this->awardXP($user, $totalPoints);
         
+        // Ensure user has stats
+        if (!$user->stats) {
+            $user->stats()->create([
+                'total_points' => 0,
+                'available_points' => 0,
+                'weekly_points' => 0,
+                'monthly_points' => 0,
+                'current_global_streak' => 0,
+                'best_global_streak' => 0,
+            ]);
+        }
+        
         $user->stats->increment('total_points', $totalPoints);
         $user->stats->increment('available_points', $totalPoints);
         $user->stats->increment('weekly_points', $totalPoints);
@@ -78,21 +90,41 @@ class PointsService
     public function awardXP(User $user, int $xp): void
     {
         $level = $user->level;
+        
+        // Ensure user has a level record
+        if (!$level) {
+            $level = $user->level()->create([
+                'current_level' => 1,
+                'current_xp' => 0,
+                'total_xp' => 0,
+            ]);
+        }
+        
         $level->increment('current_xp', $xp);
         $level->increment('total_xp', $xp);
         
         // Check for level up
-        while ($level->current_xp >= $level->required_xp) {
-            $overflow = $level->current_xp - $level->required_xp;
+        // Calculate required XP dynamically: level * 100
+        $requiredXp = $level->current_level * 100;
+        
+        while ($level->current_xp >= $requiredXp) {
+            $overflow = $level->current_xp - $requiredXp;
             $level->increment('current_level');
             $level->current_xp = $overflow;
             
+            // Recalculate required XP for new level
+            $requiredXp = $level->current_level * 100;
+            
             // Award bonus points for leveling up
             $bonusPoints = $level->current_level * 50;
-            $user->stats->increment('available_points', $bonusPoints);
             
-            // Dispatch event for celebration
-            event(new \App\Events\UserLeveledUp($user, $level->current_level));
+            // Ensure user has stats
+            if ($user->stats) {
+                $user->stats->increment('available_points', $bonusPoints);
+            }
+            
+            // TODO: Create UserLeveledUp event for celebration
+            // event(new \App\Events\UserLeveledUp($user, $level->current_level));
         }
         
         $level->save();

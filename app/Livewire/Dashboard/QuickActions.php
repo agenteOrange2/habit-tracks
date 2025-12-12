@@ -10,13 +10,13 @@ class QuickActions extends Component
         [
             'title' => 'Nuevo Hábito',
             'icon' => '➕',
-            'route' => 'habits.create',
+            'route' => 'admin.habits.create',
             'color' => 'blue',
         ],
         [
             'title' => 'Pomodoro',
             'icon' => '🍅',
-            'route' => 'pomodoro.index',
+            'route' => 'admin.pomodoro',
             'color' => 'red',
         ],
         [
@@ -28,7 +28,7 @@ class QuickActions extends Component
         [
             'title' => 'Diario',
             'icon' => '📝',
-            'route' => 'journal.create',
+            'route' => 'admin.journal.create',
             'color' => 'green',
         ],
     ];

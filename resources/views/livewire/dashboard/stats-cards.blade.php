@@ -1,10 +1,10 @@
 <div class="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
     {{-- Level/XP Card --}}
-    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800" wire:loading.class="animate-pulse">
+    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800 transition-opacity" wire:loading.class="opacity-50">
         <div class="flex justify-between items-start mb-4">
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-slate-500 dark:text-gray-400">Nivel</p>
-                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1 transition-all duration-300">
                     Nivel {{ $this->userLevel->current_level ?? 1 }}
                 </h3>
                 <p class="text-xs text-slate-400 dark:text-gray-500 mt-1 truncate">
@@ -27,11 +27,11 @@
     </div>
 
     {{-- Streak Card --}}
-    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800" wire:loading.class="animate-pulse">
+    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800 transition-opacity" wire:loading.class="opacity-50">
         <div class="flex justify-between items-start mb-4">
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-slate-500 dark:text-gray-400">Racha de Actividad</p>
-                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1 transition-all duration-300">
                     {{ $this->currentStreak }} Días
                 </h3>
                 <p class="text-xs text-slate-400 dark:text-gray-500 mt-1">
@@ -47,7 +47,7 @@
         <div class="mt-4 flex gap-1">
             @foreach($this->last7Days as $day)
                 <div 
-                    class="h-2 flex-1 rounded-sm transition-colors {{ $day['hasActivity'] ? 'bg-primary-600' : 'bg-gray-200 dark:bg-neutral-700' }}"
+                    class="h-2 flex-1 rounded-sm transition-all duration-300 {{ $day['hasActivity'] ? 'bg-primary-600' : 'bg-gray-200 dark:bg-neutral-700' }}"
                     title="{{ $day['date']->format('d/m/Y') }}"
                 ></div>
             @endforeach
@@ -55,12 +55,12 @@
     </div>
 
     {{-- Completion Rate Card --}}
-    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800" wire:loading.class="animate-pulse">
+    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-neutral-700 dark:bg-gray-800 transition-opacity" wire:loading.class="opacity-50">
         <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-slate-500 dark:text-gray-400">Tasa de Completitud</p>
                 <div class="flex items-end gap-2 mt-1">
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white transition-all duration-300">
                         {{ number_format($this->completionRate, 0) }}%
                     </h3>
                     <span class="text-sm text-slate-400 dark:text-gray-500 mb-1">hoy</span>

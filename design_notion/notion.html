@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Notion Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: #37352F;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Colores Específicos de Notion */
+        .notion-sidebar { background-color: #F7F7F5; }
+        .notion-border { border: 1px solid #E9E9E7; }
+        .notion-hover:hover { background-color: #EFEFED; }
+        
+        /* Fondos Pastel (Callouts y Etiquetas) */
+        .bg-notion-gray { background-color: #F1F1EF; }
+        .bg-notion-blue { background-color: #E7F3F8; color: #154664; }
+        .bg-notion-red { background-color: #FDEBEC; color: #5D1715; }
+        .bg-notion-purple { background-color: #F6F3F9; color: #392558; }
+        .bg-notion-green { background-color: #EDF3EC; color: #18443B; }
+        .bg-notion-orange { background-color: #FAEBDD; color: #8F4C09; }
+
+        /* Estilo para checkbox personalizado */
+        .notion-checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #37352F;
+            border-radius: 3px;
+            display: grid;
+            place-content: center;
+        }
+        .notion-checkbox::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: #2EAADC;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .notion-checkbox:checked {
+            background-color: #2EAADC;
+            border-color: #2EAADC;
+        }
+        .notion-checkbox:checked::before {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-sm">
+
+    <aside class="w-64 notion-sidebar border-r border-gray-200 flex flex-col flex-shrink-0">
+        <div class="p-3 m-2 hover:bg-gray-200 rounded cursor-pointer transition flex items-center gap-2">
+            <div class="w-5 h-5 bg-orange-800 rounded text-white flex items-center justify-center text-xs font-bold">M</div>
+            <span class="font-medium text-gray-700 truncate">FocusFlow Workspace</span>
+            <span class="text-xs text-gray-400 ml-auto">▼</span>
+        </div>
+
+        <nav class="flex-1 px-2 space-y-0.5 overflow-y-auto">
+            <div class="px-3 py-1 mt-4 text-xs font-bold text-gray-500">Navigation</div>
+            <a href="#" class="flex items-center px-3 py-1 text-gray-600 rounded hover:bg-gray-200 bg-gray-200 font-medium">
+                <span class="mr-2">🏠</span> Resumen General
+            </a>
+            <a href="#" class="flex items-center px-3 py-1 text-gray-600 rounded hover:bg-gray-200">
+                <span class="mr-2">📊</span> Estadísticas
+            </a>
+            <a href="#" class="flex items-center px-3 py-1 text-gray-600 rounded hover:bg-gray-200">
+                <span class="mr-2">⚙️</span> Configuración
+            </a>
+
+            <div class="px-3 py-1 mt-6 text-xs font-bold text-gray-500">Repository</div>
+            <a href="#" class="flex items-center px-3 py-1 text-gray-600 rounded hover:bg-gray-200">
+                <span class="mr-2">📂</span> Documentación
+            </a>
+        </nav>
+
+        <div class="p-3 border-t border-gray-200">
+            <div class="flex items-center gap-2 text-gray-600 hover:bg-gray-200 p-1 rounded cursor-pointer">
+                <div class="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center text-[10px]">MB</div>
+                <span>Mauricio Belmonte</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+        <header class="h-12 flex items-center justify-between px-6 sticky top-0 bg-white/95 backdrop-blur z-10">
+            <div class="text-gray-400 text-xs flex gap-1">
+                <span class="hover:underline cursor-pointer">FocusFlow</span>
+                <span>/</span>
+                <span class="text-gray-700 cursor-pointer">Dashboard</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="text-xs text-gray-500 font-mono border rounded px-2 py-1">FOCUS TIMER 25:00</div>
+                <button class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-blue-700">▶</button>
+            </div>
+        </header>
+
+        <div class="max-w-4xl mx-auto px-6 py-8 pb-20">
+            
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-[#37352F] mb-2">Buenos días, Mauricio</h1>
+                <p class="text-gray-500 text-base">Aquí está tu resumen de hoy.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="p-4 rounded border notion-border hover:bg-gray-50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2 text-gray-500 text-xs uppercase tracking-wide font-semibold">Nivel Actual</div>
+                        <span class="text-base">🌱</span>
+                    </div>
+                    <div class="text-xl font-semibold mb-1">Nivel 1</div>
+                    <div class="text-xs text-gray-400 mb-2">Principiante</div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-green-500 h-1.5 rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded border notion-border hover:bg-gray-50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2 text-gray-500 text-xs uppercase tracking-wide font-semibold">Racha</div>
+                        <span class="text-base">🔥</span>
+                    </div>
+                    <div class="text-xl font-semibold mb-1">0 Días</div>
+                    <div class="text-xs text-gray-400">¡Sigue así!</div>
+                </div>
+
+                <div class="p-4 rounded border notion-border hover:bg-gray-50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2 text-gray-500 text-xs uppercase tracking-wide font-semibold">Hoy</div>
+                        <span class="text-base">✅</span>
+                    </div>
+                    <div class="text-xl font-semibold mb-1">0%</div>
+                    <div class="text-xs text-gray-400">Hábitos completados</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-2">Logros Recientes</h3>
+                    <div class="p-4 bg-notion-gray rounded flex gap-3 items-center text-gray-600">
+                        <span class="text-xl">🏆</span>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">Aún no has desbloqueado logros</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Completa hábitos para verlos aquí.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-2">Recompensas Activas</h3>
+                    <div class="p-4 bg-notion-gray rounded flex gap-3 items-center text-gray-600 group cursor-pointer hover:bg-gray-200 transition">
+                        <span class="text-xl">🎁</span>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">Crear nueva recompensa</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Personaliza tus incentivos.</p>
+                        </div>
+                        <span class="opacity-0 group-hover:opacity-100 text-gray-400 text-lg">+</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-medium text-[#37352F]">Logros Recientes</h3>
+                        <span class="text-xs text-gray-400 hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">Ver todos →</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="border notion-border rounded-md p-0 overflow-hidden hover:bg-gray-50 cursor-pointer transition shadow-[0_1px_2px_rgba(0,0,0,0.05)] bg-white">
+                            <div class="h-16 bg-notion-orange flex items-center justify-center">
+                                <span class="text-3xl">🔥</span>
+                            </div>
+                            <div class="p-3">
+                                <div class="font-medium text-sm text-gray-800 mb-1">Racha de 7 Días</div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] bg-orange-100 text-orange-800 font-medium">+100 XP</span>
+                                    <span class="text-[10px] text-gray-400">Hace 2h</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border notion-border rounded-md p-0 overflow-hidden hover:bg-gray-50 cursor-pointer transition shadow-[0_1px_2px_rgba(0,0,0,0.05)] bg-white">
+                            <div class="h-16 bg-notion-blue flex items-center justify-center">
+                                <span class="text-3xl">🧘‍♂️</span>
+                            </div>
+                            <div class="p-3">
+                                <div class="font-medium text-sm text-gray-800 mb-1">Mente Zen</div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-800 font-medium">+50 XP</span>
+                                    <span class="text-[10px] text-gray-400">Ayer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-medium text-[#37352F]">Recompensas Disponibles</h3>
+                        <div class="flex items-center gap-2">
+                             <span class="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">💰 450 Pts</span>
+                             <span class="text-xs text-gray-400 hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">•••</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <div class="group flex items-center justify-between p-2 rounded border notion-border bg-white hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-lg">🎬</div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Noche de Película</p>
+                                    <p class="text-[10px] text-gray-400">Sin interrupciones</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 font-medium border border-gray-200">200 pts</span>
+                                <button class="opacity-0 group-hover:opacity-100 text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-700 transition">
+                                    Canjear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="group flex items-center justify-between p-2 rounded border notion-border bg-white hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-lg">🍔</div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Cheat Meal</p>
+                                    <p class="text-[10px] text-gray-400">Hamburguesa favorita</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 font-medium border border-gray-200">500 pts</span>
+                                <button class="opacity-0 group-hover:opacity-100 text-xs bg-gray-200 text-gray-400 px-2 py-1 rounded cursor-not-allowed" disabled>
+                                    Faltan 50
+                                </button>
+                            </div>
+                        </div>
+                        
+                         <div class="group flex items-center justify-between p-2 rounded border notion-border bg-white hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-lg">🎮</div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">1h Videojuegos</p>
+                                    <p class="text-[10px] text-gray-400">Entre semana</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 font-medium border border-gray-200">150 pts</span>
+                                <button class="opacity-0 group-hover:opacity-100 text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-700 transition">
+                                    Canjear
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-lg">⚡</span>
+                    <h3 class="font-medium text-gray-900">Energía</h3>
+                    <span class="ml-auto text-xs text-gray-500 font-mono">100/100</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded h-2 overflow-hidden">
+                    <div class="bg-blue-500 h-full w-full"></div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Energía alta - ¡Estás listo para completar hábitos!</p>
+            </div>
+
+            <hr class="border-gray-200 mb-8">
+
+            <div class="mb-10">
+                <h3 class="font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button class="flex items-center gap-2 p-2 rounded bg-notion-blue hover:opacity-80 transition text-left">
+                        <span class="text-lg">➕</span>
+                        <span class="text-sm font-medium">Nuevo Hábito</span>
+                    </button>
+                    <button class="flex items-center gap-2 p-2 rounded bg-notion-red hover:opacity-80 transition text-left">
+                        <span class="text-lg">🍅</span>
+                        <span class="text-sm font-medium">Pomodoro</span>
+                    </button>
+                    <button class="flex items-center gap-2 p-2 rounded bg-notion-purple hover:opacity-80 transition text-left">
+                        <span class="text-lg">🎁</span>
+                        <span class="text-sm font-medium">Recompensas</span>
+                    </button>
+                    <button class="flex items-center gap-2 p-2 rounded bg-notion-green hover:opacity-80 transition text-left">
+                        <span class="text-lg">📝</span>
+                        <span class="text-sm font-medium">Diario</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    Hábitos de Hoy <span class="text-xs text-gray-400 font-normal border rounded px-1">8</span>
+                </h3>
+                
+                <div class="border notion-border rounded-sm overflow-hidden">
+                    <div class="flex items-center bg-gray-50 border-b notion-border px-3 py-2 text-xs text-gray-500">
+                        <div class="w-8"></div> <div class="flex-1 font-medium">Nombre</div>
+                        <div class="w-24 font-medium border-l border-gray-200 pl-3">Recompensa</div>
+                    </div>
+
+                    <div class="flex items-center px-3 py-2 border-b border-gray-100 hover:bg-gray-50 group transition">
+                        <div class="w-8 flex items-center">
+                            <input type="checkbox" class="notion-checkbox cursor-pointer">
+                        </div>
+                        <div class="flex-1 text-gray-800 flex items-center gap-2">
+                            <span class="text-lg">💻</span>
+                            <span>Estudiar Javascript</span>
+                        </div>
+                        <div class="w-24 border-l border-gray-100 pl-3">
+                            <span class="bg-notion-purple px-1.5 py-0.5 rounded text-xs">50 XP</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center px-3 py-2 border-b border-gray-100 hover:bg-gray-50 group transition">
+                        <div class="w-8 flex items-center">
+                            <input type="checkbox" class="notion-checkbox cursor-pointer">
+                        </div>
+                        <div class="flex-1 text-gray-800 flex items-center gap-2">
+                            <span class="text-lg">📧</span>
+                            <span>Revisar emails</span>
+                        </div>
+                        <div class="w-24 border-l border-gray-100 pl-3">
+                            <span class="bg-notion-blue px-1.5 py-0.5 rounded text-xs">10 XP</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center px-3 py-2 border-b border-gray-100 hover:bg-gray-50 group transition">
+                        <div class="w-8 flex items-center">
+                            <input type="checkbox" class="notion-checkbox cursor-pointer">
+                        </div>
+                        <div class="flex-1 text-gray-800 flex items-center gap-2">
+                            <span class="text-lg">🏋️</span>
+                            <span>Hacer ejercicio</span>
+                        </div>
+                        <div class="w-24 border-l border-gray-100 pl-3">
+                            <span class="bg-notion-green px-1.5 py-0.5 rounded text-xs">25 XP</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center px-3 py-2 border-b border-gray-100 bg-gray-50 group transition">
+                        <div class="w-8 flex items-center">
+                            <input type="checkbox" class="notion-checkbox cursor-pointer" checked>
+                        </div>
+                        <div class="flex-1 text-gray-400 line-through flex items-center gap-2">
+                            <span class="text-lg opacity-50">🧺</span>
+                            <span>Lavar ropa</span>
+                        </div>
+                        <div class="w-24 border-l border-gray-100 pl-3">
+                            <span class="bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded text-xs">10 XP</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center px-3 py-2 text-gray-400 text-xs hover:bg-gray-50 cursor-pointer">
+                        <span class="mr-2">+</span> Nuevo
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-3 flex items-center justify-between">
+                        Progreso Semanal <span class="text-xs text-gray-400">📊</span>
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-6 text-gray-400">Lun</span>
+                            <div class="flex-1 h-6 bg-gray-100 rounded relative overflow-hidden">
+                                <span class="absolute right-2 top-1 text-[10px] text-gray-400">0%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-6 text-gray-400">Mar</span>
+                            <div class="flex-1 h-6 bg-gray-100 rounded relative overflow-hidden"></div>
+                        </div>
+                         <div class="flex items-center gap-2 text-xs">
+                            <span class="w-6 text-gray-900 font-bold">Dom</span>
+                            <div class="flex-1 h-6 bg-blue-50 border border-blue-200 rounded relative overflow-hidden">
+                                <div class="absolute inset-0 bg-blue-100 w-1/4"></div>
+                                <span class="absolute left-2 top-1 text-[10px] text-blue-800 z-10">0 / 13 hábitos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-3 flex items-center justify-between">
+                        Actividad <span class="text-xs text-gray-400">📅</span>
+                    </h3>
+                    <div class="flex flex-wrap gap-1">
+                        <div class="w-3 h-3 bg-gray-200 rounded-sm"></div>
+                        <div class="w-3 h-3 bg-gray-200 rounded-sm"></div>
+                        <div class="w-3 h-3 bg-green-200 rounded-sm"></div>
+                        <div class="w-3 h-3 bg-green-400 rounded-sm"></div>
+                        <div class="w-3 h-3 bg-gray-200 rounded-sm"></div>
+                        <div class="w-3 h-3 bg-gray-100 rounded-sm border border-gray-200"></div>
+                        <div class="w-3 h-3 bg-gray-100 rounded-sm border border-gray-200"></div>
+                        <div class="w-3 h-3 bg-gray-100 rounded-sm border border-gray-200"></div>
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-2 flex items-center gap-1">
+                        Menos 
+                        <span class="w-2 h-2 bg-gray-200 rounded-sm"></span>
+                        <span class="w-2 h-2 bg-green-200 rounded-sm"></span>
+                        <span class="w-2 h-2 bg-green-500 rounded-sm"></span>
+                        Más
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

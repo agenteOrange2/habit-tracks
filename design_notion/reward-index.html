@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Recompensas - Notion Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; color: #37352F; }
+
+        /* Colores de Categoría (Covers + Badges) */
+        .theme-purple { --bg-cover: #EAE4F2; --bg-badge: #F6F3F9; --text-badge: #442A66; } /* Entretenimiento */
+        .theme-orange { --bg-cover: #FAEBDD; --bg-badge: #FADEC9; --text-badge: #49290E; } /* Comida */
+        .theme-green  { --bg-cover: #DDEDEA; --bg-badge: #DBEDDB; --text-badge: #1C3829; } /* Social */
+        .theme-blue   { --bg-cover: #DDEBF1; --bg-badge: #D3E5EF; --text-badge: #183347; } /* Ocio/Videojuegos */
+        .theme-red    { --bg-cover: #FBE4E4; --bg-badge: #FFE2DD; --text-badge: #5D1715; } /* Compras */
+
+        /* Tarjeta de Galería */
+        .notion-card {
+            border: 1px solid #E9E9E7;
+            border-radius: 4px;
+            overflow: hidden;
+            background: white;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+            display: flex; flex-direction: column;
+        }
+        .notion-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        /* Botón de Canjear (Notion Button Property) */
+        .redeem-btn {
+            border: 1px solid #E9E9E7;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex; items-center; justify-center; gap: 6px;
+            padding: 6px;
+            transition: all 0.1s;
+        }
+        /* Estado: Disponible (Comprable) */
+        .can-buy { background: white; color: #37352F; }
+        .can-buy:hover { background: #EDF3EC; border-color: #DBEDDB; color: #18443B; } /* Verde sutil al hover */
+        
+        /* Estado: Bloqueado (Insuficiente saldo) */
+        .cant-buy { background: #F7F7F5; color: #9B9A97; cursor: not-allowed; border-color: transparent; }
+
+        /* Badge de Categoría */
+        .badge {
+            display: inline-flex; padding: 0 6px; border-radius: 3px; font-size: 12px; height: 20px; align-items: center;
+            background-color: var(--bg-badge); color: var(--text-badge);
+        }
+
+        /* Barra de Progreso Minimalista */
+        .progress-track { height: 4px; background: #F1F1EF; border-radius: 2px; overflow: hidden; width: 100%; }
+        .progress-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-3xl">🎁</span>
+                    <h1 class="text-3xl font-bold text-[#37352F]">Tienda de Recompensas</h1>
+                </div>
+                <p class="text-[#787774] text-sm">Canjea tus puntos por premios bien merecidos.</p>
+            </div>
+
+            <div class="flex items-center gap-3 bg-white border border-[#E9E9E7] p-1.5 pr-4 rounded-full shadow-sm">
+                <div class="w-8 h-8 rounded-full bg-[#FBF3DB] flex items-center justify-center text-lg">🪙</div>
+                <div class="flex flex-col leading-none">
+                    <span class="text-[10px] text-[#9B9A97] font-bold uppercase tracking-wide">Saldo Disponible</span>
+                    <span class="text-lg font-bold text-[#37352F]">230 pts</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1 overflow-x-auto border-b border-[#E9E9E7] pb-0 mb-6">
+            <button class="px-3 py-2 text-sm font-medium text-[#37352F] border-b-2 border-[#37352F]">Todas</button>
+            <button class="px-3 py-2 text-sm font-medium text-[#787774] hover:bg-[#EFEFED] rounded-t transition">🍿 Entretenimiento</button>
+            <button class="px-3 py-2 text-sm font-medium text-[#787774] hover:bg-[#EFEFED] rounded-t transition">🍕 Comida</button>
+            <button class="px-3 py-2 text-sm font-medium text-[#787774] hover:bg-[#EFEFED] rounded-t transition">🎮 Videojuegos</button>
+            <button class="px-3 py-2 text-sm font-medium text-[#787774] hover:bg-[#EFEFED] rounded-t transition">🛍️ Compras</button>
+            <button class="ml-auto text-sm text-[#2383E2] hover:bg-[#E7F3F8] px-3 py-1.5 rounded transition font-medium flex items-center gap-1">
+                <span>+</span> Nueva Recompensa
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+            <div class="notion-card theme-red group">
+                <div class="h-14 w-full" style="background-color: var(--bg-cover);"></div>
+                
+                <div class="px-4 pb-4 -mt-7 relative flex-1 flex flex-col">
+                    <div class="w-12 h-12 bg-white rounded shadow-sm border border-[#E9E9E7] flex items-center justify-center text-2xl mb-3">
+                        🎁
+                    </div>
+
+                    <div class="mb-1">
+                        <span class="badge mb-2">Compras</span>
+                        <h3 class="font-semibold text-[#37352F] text-[15px] leading-tight">Artículo de wishlist</h3>
+                    </div>
+
+                    <div class="mt-2 mb-4">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-[#37352F]">200</span>
+                            <span class="text-xs text-[#9B9A97] font-medium">pts</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="progress-track">
+                                <div class="progress-fill bg-[#27AE60]" style="width: 100%;"></div>
+                            </div>
+                            <span class="text-[10px] text-[#27AE60] font-bold">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-t border-[#F1F1EF]">
+                        <button class="redeem-btn can-buy w-full">
+                            <span>✨</span> Canjear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notion-card theme-purple group">
+                <div class="h-14 w-full" style="background-color: var(--bg-cover);"></div>
+                
+                <div class="px-4 pb-4 -mt-7 relative flex-1 flex flex-col">
+                    <div class="w-12 h-12 bg-white rounded shadow-sm border border-[#E9E9E7] flex items-center justify-center text-2xl mb-3">
+                        📺
+                    </div>
+
+                    <div class="mb-1">
+                        <span class="badge mb-2">Entretenimiento</span>
+                        <h3 class="font-semibold text-[#37352F] text-[15px] leading-tight">Ver episodio de serie</h3>
+                    </div>
+
+                    <div class="mt-2 mb-4">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-[#37352F]">30</span>
+                            <span class="text-xs text-[#9B9A97] font-medium">pts</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="progress-track">
+                                <div class="progress-fill bg-[#27AE60]" style="width: 100%;"></div>
+                            </div>
+                            <span class="text-[10px] text-[#27AE60] font-bold">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-t border-[#F1F1EF]">
+                        <button class="redeem-btn can-buy w-full">
+                            <span>✨</span> Canjear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notion-card theme-green group">
+                <div class="h-14 w-full" style="background-color: var(--bg-cover);"></div>
+                
+                <div class="px-4 pb-4 -mt-7 relative flex-1 flex flex-col">
+                    <div class="w-12 h-12 bg-white rounded shadow-sm border border-[#E9E9E7] flex items-center justify-center text-2xl mb-3">
+                        🎉
+                    </div>
+
+                    <div class="mb-1">
+                        <span class="badge mb-2">Social</span>
+                        <h3 class="font-semibold text-[#37352F] text-[15px] leading-tight">Salir con amigos</h3>
+                    </div>
+
+                    <div class="mt-2 mb-4">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-[#37352F]">75</span>
+                            <span class="text-xs text-[#9B9A97] font-medium">pts</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="progress-track">
+                                <div class="progress-fill bg-[#27AE60]" style="width: 100%;"></div>
+                            </div>
+                            <span class="text-[10px] text-[#27AE60] font-bold">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-t border-[#F1F1EF]">
+                        <button class="redeem-btn can-buy w-full">
+                            <span>✨</span> Canjear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notion-card theme-blue group opacity-75 hover:opacity-100 transition">
+                <div class="h-14 w-full" style="background-color: var(--bg-cover);"></div>
+                
+                <div class="px-4 pb-4 -mt-7 relative flex-1 flex flex-col">
+                    <div class="w-12 h-12 bg-white rounded shadow-sm border border-[#E9E9E7] flex items-center justify-center text-2xl mb-3 grayscale">
+                        🎮
+                    </div>
+
+                    <div class="mb-1">
+                        <span class="badge mb-2">Videojuegos</span>
+                        <h3 class="font-semibold text-[#37352F] text-[15px] leading-tight">Juego Nuevo AAA</h3>
+                    </div>
+
+                    <div class="mt-2 mb-4">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-gray-400">500</span> <span class="text-xs text-[#9B9A97] font-medium">pts</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="progress-track">
+                                <div class="progress-fill bg-[#F2C94C]" style="width: 46%;"></div>
+                            </div>
+                            <span class="text-[10px] text-[#F2C94C] font-bold">46%</span>
+                        </div>
+                        <p class="text-[10px] text-red-400 mt-1">Faltan 270 pts</p>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-t border-[#F1F1EF]">
+                        <button class="redeem-btn cant-buy w-full" disabled>
+                            🔒 Bloqueado
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+             <div class="notion-card theme-orange group">
+                <div class="h-14 w-full" style="background-color: var(--bg-cover);"></div>
+                
+                <div class="px-4 pb-4 -mt-7 relative flex-1 flex flex-col">
+                    <div class="w-12 h-12 bg-white rounded shadow-sm border border-[#E9E9E7] flex items-center justify-center text-2xl mb-3">
+                        🍕
+                    </div>
+
+                    <div class="mb-1">
+                        <span class="badge mb-2">Comida</span>
+                        <h3 class="font-semibold text-[#37352F] text-[15px] leading-tight">Comida Favorita</h3>
+                    </div>
+
+                    <div class="mt-2 mb-4">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-[#37352F]">80</span>
+                            <span class="text-xs text-[#9B9A97] font-medium">pts</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="progress-track">
+                                <div class="progress-fill bg-[#27AE60]" style="width: 100%;"></div>
+                            </div>
+                            <span class="text-[10px] text-[#27AE60] font-bold">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-t border-[#F1F1EF]">
+                        <button class="redeem-btn can-buy w-full">
+                            <span>✨</span> Canjear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

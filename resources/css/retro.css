@@ -1,0 +1,159 @@
+/* Retro Theme Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+
+:root {
+    --retro-green: #00ff00;
+    --retro-green-dark: #00aa00;
+    --retro-orange: #ff6600;
+    --retro-cyan: #00ffff;
+    --retro-yellow: #ffff00;
+    --retro-bg: #0a0a0a;
+    --retro-bg-light: #1a1a1a;
+}
+
+/* Retro Sidebar Styles */
+.retro-sidebar {
+    background: var(--retro-bg-light) !important;
+    border-right: 3px solid var(--retro-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2) !important;
+}
+
+.retro-sidebar .flux-sidebar-toggle {
+    color: var(--retro-green) !important;
+    border: 2px solid var(--retro-green) !important;
+}
+
+.retro-sidebar a {
+    color: var(--retro-green) !important;
+    font-family: 'Courier New', monospace !important;
+    letter-spacing: 1px !important;
+}
+
+.retro-sidebar .flux-navlist-item {
+    border: 1px solid transparent !important;
+    transition: all 0.3s !important;
+}
+
+.retro-sidebar .flux-navlist-item:hover {
+    border-color: var(--retro-green) !important;
+    background: rgba(0, 255, 0, 0.1) !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3) !important;
+}
+
+.retro-sidebar .flux-navlist-item[aria-current="page"] {
+    background: var(--retro-green) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+}
+
+.retro-sidebar .flux-navlist-item[aria-current="page"] * {
+    color: #000 !important;
+}
+
+/* Retro Logo */
+.retro-logo {
+    font-family: 'Press Start 2P', cursive !important;
+    color: var(--retro-green) !important;
+    text-shadow: 0 0 10px var(--retro-green) !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 2px !important;
+}
+
+/* Retro Profile */
+.retro-profile {
+    border: 2px solid var(--retro-green) !important;
+    background: #000 !important;
+    padding: 0.75rem !important;
+}
+
+.retro-profile span {
+    color: var(--retro-green) !important;
+    font-family: 'Courier New', monospace !important;
+}
+
+/* Retro Menu */
+.retro-menu {
+    background: var(--retro-bg-light) !important;
+    border: 2px solid var(--retro-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3) !important;
+}
+
+.retro-menu .flux-menu-item {
+    color: var(--retro-green) !important;
+    font-family: 'Courier New', monospace !important;
+}
+
+.retro-menu .flux-menu-item:hover {
+    background: rgba(0, 255, 0, 0.2) !important;
+}
+
+/* CRT Screen Effect */
+@keyframes flicker {
+    0% {
+        opacity: 0.97;
+    }
+    5% {
+        opacity: 0.98;
+    }
+    10% {
+        opacity: 0.96;
+    }
+    15% {
+        opacity: 0.99;
+    }
+    20% {
+        opacity: 0.97;
+    }
+    25% {
+        opacity: 0.98;
+    }
+    30% {
+        opacity: 0.96;
+    }
+    35% {
+        opacity: 0.99;
+    }
+    40% {
+        opacity: 0.97;
+    }
+    45% {
+        opacity: 0.98;
+    }
+    50% {
+        opacity: 0.96;
+    }
+    55% {
+        opacity: 0.99;
+    }
+    60% {
+        opacity: 0.97;
+    }
+    65% {
+        opacity: 0.98;
+    }
+    70% {
+        opacity: 0.96;
+    }
+    75% {
+        opacity: 0.99;
+    }
+    80% {
+        opacity: 0.97;
+    }
+    85% {
+        opacity: 0.98;
+    }
+    90% {
+        opacity: 0.96;
+    }
+    95% {
+        opacity: 0.99;
+    }
+    100% {
+        opacity: 0.97;
+    }
+}
+
+body {
+    animation: flicker 0.15s infinite;
+}
