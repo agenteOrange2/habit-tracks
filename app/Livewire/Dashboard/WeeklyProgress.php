@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -11,6 +12,13 @@ class WeeklyProgress extends Component
     public $weekDays = [];
 
     public function mount(): void
+    {
+        $this->loadWeekProgress();
+    }
+
+    #[On('habitCompleted')]
+    #[On('habitUncompleted')]
+    public function refreshProgress(): void
     {
         $this->loadWeekProgress();
     }

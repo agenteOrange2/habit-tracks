@@ -30,7 +30,9 @@ class DifficultyForm extends Component
                 'string',
                 'min:3',
                 'max:50',
-                Rule::unique('difficulties', 'name')->ignore($this->difficultyId),
+                Rule::unique('difficulties', 'name')
+                    ->where('user_id', auth()->id())
+                    ->ignore($this->difficultyId),
             ],
             'icon' => 'required|string|max:10',
             'points' => 'required|integer|min:1|max:1000',

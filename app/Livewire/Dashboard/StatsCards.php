@@ -29,13 +29,24 @@ class StatsCards extends Component
     #[Computed(cache: true, seconds: 300)]
     public function userStats()
     {
-        return Auth::user()->stats;
+        $stats = Auth::user()->stats;
+        
+        if (!$stats) {
+            return (object) [
+                'current_global_streak' => 0,
+                'best_global_streak' => 0,
+                'total_points' => 0,
+                'available_points' => 0,
+            ];
+        }
+        
+        return $stats;
     }
 
     #[Computed(cache: true, seconds: 300)]
     public function currentStreak()
     {
-        return Auth::user()->stats->current_global_streak ?? 0;
+        return Auth::user()->stats?->current_global_streak ?? 0;
     }
 
     #[Computed]

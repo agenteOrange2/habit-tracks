@@ -18,9 +18,15 @@ class HabitSeeder extends Seeder
             return;
         }
 
-        // Obtener mapeo de categorías y dificultades por slug
-        $categories = Category::pluck('id', 'slug')->toArray();
-        $difficulties = Difficulty::pluck('id', 'slug')->toArray();
+        // Obtener mapeo de categorías y dificultades por slug (sin global scope)
+        $categories = Category::withoutGlobalScope('user')
+            ->where('user_id', $user->id)
+            ->pluck('id', 'slug')
+            ->toArray();
+        $difficulties = Difficulty::withoutGlobalScope('user')
+            ->where('user_id', $user->id)
+            ->pluck('id', 'slug')
+            ->toArray();
 
         $this->command->info("Creando hábitos para el usuario: {$user->name}");
 

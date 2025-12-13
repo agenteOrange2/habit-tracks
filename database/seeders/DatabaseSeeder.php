@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Services\DefaultDataService;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,27 +23,9 @@ class DatabaseSeeder extends Seeder
             'two_factor_confirmed_at' => null,
         ]);
 
-        // Create user stats and level
-        $user->stats()->create([
-            'total_points' => 0,
-            'available_points' => 0,
-            'weekly_points' => 0,
-            'monthly_points' => 0,
-            'current_global_streak' => 0,
-            'best_global_streak' => 0,
-        ]);
-
-        $user->level()->create([
-            'current_level' => 1,
-            'current_xp' => 0,
-            'total_xp' => 0,
-        ]);
-
-        // Seed categories and difficulties
-        $this->call([
-            CategorySeeder::class,
-            DifficultySeeder::class,
-        ]);
+        // Create all default data for user (stats, level, categories, difficulties)
+        $defaultDataService = app(DefaultDataService::class);
+        $defaultDataService->createAllDefaults($user);
 
         // Seed habits
         $this->call([

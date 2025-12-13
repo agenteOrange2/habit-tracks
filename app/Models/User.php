@@ -116,6 +116,17 @@ class User extends Authenticatable
     }
 
 
+    /* Categories & Difficulties */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function difficulties(): HasMany
+    {
+        return $this->hasMany(Difficulty::class);
+    }
+
     /* Habits Models */
     public function habits(): HasMany
     {

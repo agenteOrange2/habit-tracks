@@ -2,55 +2,48 @@
 
 namespace App\Policies;
 
-use App\Models\{User, Difficulty};
+use App\Models\Difficulty;
+use App\Models\User;
 
 class DifficultyPolicy
 {
     /**
-     * Determine if the user can view any difficulties.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        // For now, all authenticated users can view difficulties
-        // In the future, this could be restricted to admins only
         return true;
     }
 
     /**
-     * Determine if the user can view the difficulty.
+     * Determine whether the user can view the model.
      */
     public function view(User $user, Difficulty $difficulty): bool
     {
-        return true;
+        return $user->id === $difficulty->user_id;
     }
 
     /**
-     * Determine if the user can create difficulties.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        // For now, all authenticated users can create difficulties
-        // In the future, this could be restricted to admins only
         return true;
     }
 
     /**
-     * Determine if the user can update the difficulty.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, Difficulty $difficulty): bool
     {
-        // For now, all authenticated users can update difficulties
-        // In the future, this could be restricted to admins only
-        return true;
+        return $user->id === $difficulty->user_id;
     }
 
     /**
-     * Determine if the user can delete the difficulty.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, Difficulty $difficulty): bool
     {
-        // For now, all authenticated users can delete difficulties
-        // In the future, this could be restricted to admins only
-        return true;
+        return $user->id === $difficulty->user_id;
     }
 }

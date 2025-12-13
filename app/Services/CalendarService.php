@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\SyncGoogleCalendarEvent;
 use App\Models\CalendarEvent;
 use App\Models\User;
+use App\Services\GoogleCalendarService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -52,6 +53,15 @@ class CalendarService
 
         // Queue Google Calendar sync if enabled
         if ($event->sync_to_google) {
+            // Check if user has Google Calendar connected
+            $googleService = app(GoogleCalendarService::class);
+            if (!$googleService->isConnected($user)) {
+                // Disable sync and warn user
+                $event->update(['sync_to_google' => false]);
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'sync_to_google' => 'Debes conectar tu Google Calendar primero. Ve a Configuración del Calendario para conectarlo.'
+                ]);
+            }
             SyncGoogleCalendarEvent::dispatch($event, 'create');
         }
 
@@ -80,6 +90,15 @@ class CalendarService
 
         // Queue Google Calendar sync if enabled
         if ($event->sync_to_google) {
+            // Check if user has Google Calendar connected
+            $googleService = app(GoogleCalendarService::class);
+            if (!$googleService->isConnected($event->user)) {
+                // Disable sync and warn user
+                $event->update(['sync_to_google' => false]);
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'sync_to_google' => 'Debes conectar tu Google Calendar primero. Ve a Configuración del Calendario para conectarlo.'
+                ]);
+            }
             SyncGoogleCalendarEvent::dispatch($event, 'update');
         }
 
@@ -145,7 +164,9 @@ class CalendarService
                     $shouldCreate = true;
                     break;
                 case 'weekly':
-                    $shouldCreate = in_array($currentDate->dayOfWeek, $parentEvent->recurrence_days ?? []);
+                    // Cast to int for comparison since checkbox values come as strings
+                    $days = array_map('intval', $parentEvent->recurrence_days ?? []);
+                    $shouldCreate = in_array($currentDate->dayOfWeek, $days);
                     break;
                 case 'monthly':
                     $shouldCreate = $currentDate->day === Carbon::parse($parentEvent->start_time)->day;
@@ -162,7 +183,8 @@ class CalendarService
                     'start_time' => $startTime,
                     'end_time' => $startTime->copy()->addMinutes($duration),
                     'parent_event_id' => $parentEvent->id,
-                    'sync_to_google' => $parentEvent->sync_to_google,
+                    // Child events don't sync to Google - parent handles recurrence via RRULE
+                    'sync_to_google' => false,
                     'reminder_minutes' => $parentEvent->reminder_minutes,
                     'color' => $parentEvent->color,
                 ]);

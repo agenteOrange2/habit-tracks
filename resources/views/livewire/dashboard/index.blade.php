@@ -73,7 +73,7 @@
     {{-- Greeting Section --}}
     <div class="header_habit flex flex-col sm:flex-row justify-between ">
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-[#37352F] mb-2">{{ $greeting }}</h1>
+            <h1 class="text-4xl font-bold text-[#37352F] mb-2">{{ $this->greeting }}</h1>
             <p class="text-gray-500 text-base">Aquí está tu resumen de hoy.</p>
         </div>
         <div class="pomodoro_box pb-4">

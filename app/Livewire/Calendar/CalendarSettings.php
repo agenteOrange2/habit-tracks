@@ -15,6 +15,8 @@ class CalendarSettings extends Component
     public bool $auto_sync = false;
     public string $default_view = 'month';
     public int $default_reminder = 15;
+    public bool $googleConnected = false;
+    public bool $googleConfigured = false;
 
     protected $rules = [
         'default_duration' => 'required|integer|min:15|max:480',
@@ -35,19 +37,15 @@ class CalendarSettings extends Component
         $this->auto_sync = $settings->auto_sync;
         $this->default_view = $settings->default_view;
         $this->default_reminder = $settings->default_reminder;
+        
+        $this->refreshGoogleStatus();
     }
 
-    #[Computed]
-    public function isGoogleConnected(): bool
+    public function refreshGoogleStatus(): void
     {
         $googleService = app(GoogleCalendarService::class);
-        return $googleService->isConnected(auth()->user());
-    }
-
-    #[Computed]
-    public function isGoogleConfigured(): bool
-    {
-        return !empty(config('google.client_id')) && !empty(config('google.client_secret'));
+        $this->googleConnected = $googleService->isConnected(auth()->user());
+        $this->googleConfigured = !empty(config('google.client_id')) && !empty(config('google.client_secret'));
     }
 
     public function connectGoogle(): string
@@ -82,7 +80,71 @@ class CalendarSettings extends Component
         
         $this->auto_sync = false;
         $this->save();
+        
+        // Refresh Google connection status
+        $this->refreshGoogleStatus();
+        
         session()->flash('message', 'Google Calendar desconectado');
+    }
+
+    public function syncExistingEvents(): void
+    {
+        $googleService = app(GoogleCalendarService::class);
+        
+        if (!$googleService->isConnected(auth()->user())) {
+            session()->flash('error', 'Debes conectar Google Calendar primero');
+            return;
+        }
+
+        // Count already synced events (only parent/standalone events, not children)
+        $alreadySynced = \App\Models\CalendarEvent::where('user_id', auth()->id())
+            ->where('sync_to_google', true)
+            ->whereNotNull('google_event_id')
+            ->whereNull('parent_event_id')
+            ->count();
+
+        // Get all events that should be synced but don't have a google_event_id
+        // Exclude child events (parent_event_id not null) - parent handles recurrence via RRULE
+        $events = \App\Models\CalendarEvent::where('user_id', auth()->id())
+            ->where('sync_to_google', true)
+            ->whereNull('google_event_id')
+            ->whereNull('parent_event_id')
+            ->get();
+
+        $synced = 0;
+        $failed = 0;
+
+        foreach ($events as $event) {
+            try {
+                $googleEventId = $googleService->createEvent($event);
+                if ($googleEventId) {
+                    $event->update(['google_event_id' => $googleEventId]);
+                    $synced++;
+                }
+            } catch (\Exception $e) {
+                $failed++;
+                \Illuminate\Support\Facades\Log::error('Failed to sync event: ' . $e->getMessage(), [
+                    'event_id' => $event->id,
+                ]);
+            }
+        }
+
+        if ($synced > 0) {
+            $msg = "Se sincronizaron {$synced} eventos nuevos a Google Calendar";
+            if ($alreadySynced > 0) {
+                $msg .= " ({$alreadySynced} ya estaban sincronizados)";
+            }
+            if ($failed > 0) {
+                $msg .= " - {$failed} fallaron";
+            }
+            session()->flash('message', $msg);
+        } elseif ($events->isEmpty() && $alreadySynced > 0) {
+            session()->flash('message', "Todos los eventos ya están sincronizados ({$alreadySynced} eventos)");
+        } elseif ($events->isEmpty()) {
+            session()->flash('message', 'No hay eventos marcados para sincronizar');
+        } else {
+            session()->flash('error', 'No se pudo sincronizar ningún evento');
+        }
     }
 
     public function render()

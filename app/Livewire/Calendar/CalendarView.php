@@ -25,10 +25,8 @@ class CalendarView extends Component
     public function mount(): void
     {
         $this->currentDate = now()->format('Y-m-d');
-        $settings = auth()->user()->calendarSetting;
-        if ($settings) {
-            $this->viewMode = $settings->default_view;
-        }
+        $settings = \App\Models\CalendarSetting::getOrCreateForUser(auth()->id());
+        $this->viewMode = $settings->default_view;
     }
 
     #[Computed]
@@ -99,16 +97,81 @@ class CalendarView extends Component
         return $this->calendarService->getEventsForDate(auth()->user(), Carbon::parse($this->selectedDate));
     }
 
+    #[Computed]
+    public function weekDays(): array
+    {
+        $date = Carbon::parse($this->currentDate);
+        $startOfWeek = $date->copy()->startOfWeek(Carbon::SUNDAY);
+        
+        $days = [];
+        for ($i = 0; $i < 7; $i++) {
+            $current = $startOfWeek->copy()->addDays($i);
+            $days[] = [
+                'date' => $current->format('Y-m-d'),
+                'day' => $current->day,
+                'dayName' => $current->translatedFormat('D'),
+                'isToday' => $current->isToday(),
+                'isSelected' => $this->selectedDate === $current->format('Y-m-d'),
+            ];
+        }
+        return $days;
+    }
+
+    #[Computed]
+    public function weekEvents(): Collection
+    {
+        $date = Carbon::parse($this->currentDate);
+        $start = $date->copy()->startOfWeek(Carbon::SUNDAY);
+        $end = $date->copy()->endOfWeek(Carbon::SATURDAY);
+        return $this->calendarService->getEventsForRange(auth()->user(), $start, $end);
+    }
+
+    #[Computed]
+    public function dayEvents(): Collection
+    {
+        return $this->calendarService->getEventsForDate(auth()->user(), Carbon::parse($this->currentDate));
+    }
+
+    #[Computed]
+    public function timeSlots(): array
+    {
+        $slots = [];
+        for ($hour = 0; $hour < 24; $hour++) {
+            $slots[] = sprintf('%02d:00', $hour);
+        }
+        return $slots;
+    }
+
+    public function previous(): void
+    {
+        $date = Carbon::parse($this->currentDate);
+        match ($this->viewMode) {
+            'month' => $this->currentDate = $date->subMonth()->format('Y-m-d'),
+            'week' => $this->currentDate = $date->subWeek()->format('Y-m-d'),
+            'day' => $this->currentDate = $date->subDay()->format('Y-m-d'),
+        };
+        $this->selectedDate = null;
+    }
+
+    public function next(): void
+    {
+        $date = Carbon::parse($this->currentDate);
+        match ($this->viewMode) {
+            'month' => $this->currentDate = $date->addMonth()->format('Y-m-d'),
+            'week' => $this->currentDate = $date->addWeek()->format('Y-m-d'),
+            'day' => $this->currentDate = $date->addDay()->format('Y-m-d'),
+        };
+        $this->selectedDate = null;
+    }
+
     public function previousMonth(): void
     {
-        $this->currentDate = $this->currentMonth->subMonth()->format('Y-m-d');
-        $this->selectedDate = null;
+        $this->previous();
     }
 
     public function nextMonth(): void
     {
-        $this->currentDate = $this->currentMonth->addMonth()->format('Y-m-d');
-        $this->selectedDate = null;
+        $this->next();
     }
 
     public function goToToday(): void

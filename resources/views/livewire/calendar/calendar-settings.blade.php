@@ -26,7 +26,7 @@
 
                 <div>
                     <flux:label>Vista predeterminada</flux:label>
-                    <flux:select wire:model="default_view">
+                    <flux:select wire:model.live="default_view">
                         <flux:select.option value="month">Mes</flux:select.option>
                         <flux:select.option value="week">Semana</flux:select.option>
                         <flux:select.option value="day">Día</flux:select.option>
@@ -35,13 +35,13 @@
 
                 <div>
                     <flux:label>Duración predeterminada de eventos (minutos)</flux:label>
-                    <flux:input type="number" wire:model="default_duration" min="15" max="480" step="15" />
+                    <flux:input type="number" wire:model.lazy="default_duration" min="15" max="480" step="15" />
                     @error('default_duration') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <flux:label>Recordatorio predeterminado (minutos antes)</flux:label>
-                    <flux:input type="number" wire:model="default_reminder" min="0" max="1440" />
+                    <flux:input type="number" wire:model.lazy="default_reminder" min="0" max="1440" />
                     @error('default_reminder') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -53,11 +53,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <flux:label>Hora de inicio</flux:label>
-                        <flux:input type="time" wire:model="working_hours_start" />
+                        <flux:input type="time" wire:model.lazy="working_hours_start" />
                     </div>
                     <div>
                         <flux:label>Hora de fin</flux:label>
-                        <flux:input type="time" wire:model="working_hours_end" />
+                        <flux:input type="time" wire:model.lazy="working_hours_end" />
                     </div>
                 </div>
             </div>
@@ -66,21 +66,27 @@
             <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 space-y-4">
                 <h3 class="font-semibold text-zinc-900 dark:text-white">📆 Google Calendar</h3>
 
-                @if($this->isGoogleConnected)
+                @if($googleConnected)
                     <div class="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                         <span class="text-green-600 dark:text-green-400">✓</span>
                         <span class="text-sm text-green-700 dark:text-green-300">Conectado a Google Calendar</span>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <flux:checkbox wire:model="auto_sync" />
+                        <flux:checkbox wire:model.live="auto_sync" />
                         <flux:label>Sincronizar automáticamente nuevos eventos</flux:label>
                     </div>
 
-                    <flux:button type="button" variant="danger" size="sm" wire:click="disconnectGoogle" wire:confirm="¿Desconectar Google Calendar?">
-                        Desconectar
-                    </flux:button>
-                @elseif($this->isGoogleConfigured)
+                    <div class="flex flex-wrap gap-2">
+                        <flux:button type="button" variant="primary" size="sm" wire:click="syncExistingEvents" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="syncExistingEvents">Sincronizar eventos existentes</span>
+                            <span wire:loading wire:target="syncExistingEvents">Sincronizando...</span>
+                        </flux:button>
+                        <flux:button type="button" variant="danger" size="sm" wire:click="disconnectGoogle" wire:confirm="¿Desconectar Google Calendar?">
+                            Desconectar
+                        </flux:button>
+                    </div>
+                @elseif($googleConfigured)
                     <div class="flex items-center gap-3 p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
                         <span class="text-zinc-500">○</span>
                         <span class="text-sm text-zinc-600 dark:text-zinc-400">No conectado</span>

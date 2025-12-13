@@ -41,7 +41,10 @@ class PointsService
                 'monthly_points' => 0,
                 'current_global_streak' => 0,
                 'best_global_streak' => 0,
+                'week_start' => now()->startOfWeek(),
+                'month_start' => now()->startOfMonth(),
             ]);
+            $user->refresh();
         }
         
         $user->stats->increment('total_points', $totalPoints);

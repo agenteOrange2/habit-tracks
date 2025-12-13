@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -11,7 +12,9 @@ use Illuminate\Support\Str;
 class Category extends Model
 {
     use HasFactory;
+
     protected $fillable = [
+        'user_id',
         'name',
         'slug',
         'icon',
@@ -25,11 +28,13 @@ class Category extends Model
         'order' => 'integer',
     ];
 
-    protected static function boot()
+    protected static function booted(): void
     {
-        parent::boot();
-
+        // Auto-assign user_id on creation
         static::creating(function ($category) {
+            if (empty($category->user_id) && auth()->check()) {
+                $category->user_id = auth()->id();
+            }
             if (empty($category->slug)) {
                 $category->slug = Str::slug($category->name);
             }
@@ -40,9 +45,21 @@ class Category extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
+
+        // Global scope to filter by authenticated user
+        static::addGlobalScope('user', function (Builder $builder) {
+            if (auth()->check()) {
+                $builder->where('categories.user_id', auth()->id());
+            }
+        });
     }
 
     // Relationships
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function habits(): HasMany
     {
         return $this->hasMany(Habit::class);
@@ -62,6 +79,11 @@ class Category extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order', 'asc');
+    }
+
+    public function scopeForUser(Builder $query, ?int $userId = null): Builder
+    {
+        return $query->where('user_id', $userId ?? auth()->id());
     }
 
     // Methods

@@ -42,7 +42,7 @@ class ActiveRewards extends Component
     protected function loadRewards(): void
     {
         $user = Auth::user();
-        $this->availablePoints = $user->stats->available_points ?? 0;
+        $this->availablePoints = $user->stats?->available_points ?? 0;
         
         // Get all available rewards
         $allRewards = $user->rewards()

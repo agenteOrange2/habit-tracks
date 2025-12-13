@@ -6,6 +6,7 @@ use App\Models\CalendarEvent;
 use App\Models\CalendarSetting;
 use App\Models\Habit;
 use App\Services\CalendarService;
+use App\Services\GoogleCalendarService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -91,6 +92,13 @@ class EventEditor extends Component
     public function isEditing(): bool
     {
         return $this->event && $this->event->exists;
+    }
+
+    #[Computed]
+    public function isGoogleConnected(): bool
+    {
+        $googleService = app(GoogleCalendarService::class);
+        return $googleService->isConnected(auth()->user());
     }
 
     public function selectHabit(int $habitId): void

@@ -16,26 +16,74 @@
         </a>
 
         <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Navigation')" class="grid">
-                <flux:navlist.item icon="home" :href="route('admin.dashboard')"
-                    :current="request()->routeIs('admin.dashboard')" wire:navigate>Dashboard</flux:navlist.item>
-                <flux:navlist.item icon="check-circle" :href="route('admin.habits.index')"
-                    :current="request()->routeIs('admin.habits.*')" wire:navigate>Hábitos</flux:navlist.item>
-                <flux:navlist.item icon="tag" :href="route('admin.categories.index')"
-                    :current="request()->routeIs('admin.categories.*')" wire:navigate>Categorías</flux:navlist.item>
-                <flux:navlist.item icon="tag" :href="route('admin.difficulties.index')"
-                    :current="request()->routeIs('admin.difficulties.*')" wire:navigate>Dificultades</flux:navlist.item>
+            {{-- Principal --}}
+            <flux:navlist.group heading="Principal" class="grid">
+                <a href="{{ route('admin.dashboard') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">🏠</span>
+                    <span>Dashboard</span>
+                </a>
+            </flux:navlist.group>
 
-                <flux:navlist.item icon="Clock" :href="route('admin.pomodoro')"
-                    :current="request()->routeIs('admin.pomodoro.*')" wire:navigate>Pomodoro</flux:navlist.item>
-                <flux:navlist.item icon="document-text" :href="route('notes.index')"
-                    :current="request()->routeIs('notes.*')" wire:navigate>Notas</flux:navlist.item>
-                <flux:navlist.item icon="book-open" :href="route('admin.journal.index')"
-                    :current="request()->routeIs('admin.journal.*')" wire:navigate>Diario</flux:navlist.item>
-                <flux:navlist.item icon="calendar-days" :href="route('admin.calendar.index')"
-                    :current="request()->routeIs('admin.calendar.*')" wire:navigate>Calendario</flux:navlist.item>
-                <flux:navlist.item icon="gift" :href="route('rewards.index')"
-                    :current="request()->routeIs('rewards.*')" wire:navigate>Recompensas</flux:navlist.item>
+            {{-- Gestión --}}
+            <flux:navlist.group heading="Gestión" class="grid">
+                <a href="{{ route('admin.habits.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.habits.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">✅</span>
+                    <span>Hábitos</span>
+                </a>
+                <a href="{{ route('admin.categories.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">🏷️</span>
+                    <span>Categorías</span>
+                </a>
+                <a href="{{ route('admin.difficulties.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.difficulties.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">📊</span>
+                    <span>Dificultades</span>
+                </a>
+            </flux:navlist.group>
+
+            {{-- Productividad --}}
+            <flux:navlist.group heading="Productividad" class="grid">
+                <a href="{{ route('admin.pomodoro') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.pomodoro.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">🍅</span>
+                    <span>Pomodoro</span>
+                </a>
+                <a href="{{ route('notes.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('notes.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">📝</span>
+                    <span>Notas</span>
+                </a>
+                <a href="{{ route('admin.journal.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.journal.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">📔</span>
+                    <span>Diario</span>
+                </a>
+                <a href="{{ route('admin.calendar.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.calendar.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">📅</span>
+                    <span>Calendario</span>
+                </a>
+            </flux:navlist.group>
+
+            {{-- Recompensas --}}
+            <flux:navlist.group heading="Recompensas" class="grid">
+                <a href="{{ route('rewards.index') }}" 
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('rewards.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">🎁</span>
+                    <span>Recompensas</span>
+                </a>
             </flux:navlist.group>
         </flux:navlist>
 

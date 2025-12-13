@@ -95,7 +95,10 @@ class HabitsList extends Component
                 
                 // Remove points that were awarded
                 $pointsToRemove = $log->points_earned ?? $habit->points_reward;
-                $user->stats()->decrement('total_points', $pointsToRemove);
+                if ($user->stats) {
+                    $user->stats->decrement('total_points', $pointsToRemove);
+                    $user->stats->decrement('available_points', $pointsToRemove);
+                }
                 
                 // Remove XP from user level
                 $userLevel = $user->level;
@@ -200,9 +203,12 @@ class HabitsList extends Component
                 $pointsService = app(PointsService::class);
                 $pointsAwarded = $pointsService->awardPoints($user, $habit, 0, false);
                 
-                // Update habit streak only (not global streak - that updates at day change)
+                // Update habit streak
                 $streakService = app(StreakService::class);
                 $streakService->updateStreak($habit);
+                
+                // Update global streak
+                $streakService->updateGlobalStreak($user);
                 
                 // Check achievements
                 $achievementService = app(AchievementService::class);

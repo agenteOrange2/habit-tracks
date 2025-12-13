@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Services\StatisticsService;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,6 +15,18 @@ class StreakCalendar extends Component
     public function mount(StatisticsService $statisticsService): void
     {
         $this->year = now()->year;
+        $this->loadHeatmapData($statisticsService);
+    }
+
+    #[On('habitCompleted')]
+    #[On('habitUncompleted')]
+    public function refreshCalendar(): void
+    {
+        $this->loadHeatmapData(app(StatisticsService::class));
+    }
+
+    protected function loadHeatmapData(StatisticsService $statisticsService): void
+    {
         $this->heatmapData = $statisticsService->getHeatmapData(Auth::user(), 365);
     }
 

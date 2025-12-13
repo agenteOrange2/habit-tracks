@@ -51,9 +51,9 @@ class DashboardOverview extends Component
         $this->totalToday = $this->todayHabits->count();
         $this->completedToday = $this->todayHabits->filter->isCompletedToday()->count();
 
-        // Stats
-        $this->currentStreak = $user->stats->current_global_streak;
-        $this->availablePoints = $user->stats->available_points;
+        // Stats (with null safety)
+        $this->currentStreak = $user->stats?->current_global_streak ?? 0;
+        $this->availablePoints = $user->stats?->available_points ?? 0;
 
         // Energía
         $this->energyStatus = $energyService->getEnergyStatus($user);

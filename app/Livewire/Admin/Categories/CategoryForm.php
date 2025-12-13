@@ -30,7 +30,9 @@ class CategoryForm extends Component
                 'string',
                 'min:3',
                 'max:50',
-                Rule::unique('categories', 'name')->ignore($this->categoryId),
+                Rule::unique('categories', 'name')
+                    ->where('user_id', auth()->id())
+                    ->ignore($this->categoryId),
             ],
             'icon' => 'required|string|max:10',
             'color' => 'required|string|max:7',

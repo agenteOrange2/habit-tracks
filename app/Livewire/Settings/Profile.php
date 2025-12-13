@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password as PasswordRule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -23,6 +25,11 @@ class Profile extends Component
     public ?string $cover_image = null;
     public string $player_class = 'programador';
     public string $deletePassword = '';
+    
+    // Password fields
+    public string $current_password = '';
+    public string $password = '';
+    public string $password_confirmation = '';
     
     // File uploads
     public $newAvatar = null;
@@ -224,6 +231,26 @@ class Profile extends Component
 
         $user->sendEmailVerificationNotification();
         Session::flash('status', 'verification-link-sent');
+    }
+
+    public function updatePassword(): void
+    {
+        try {
+            $validated = $this->validate([
+                'current_password' => ['required', 'string', 'current_password'],
+                'password' => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
+            ]);
+        } catch (ValidationException $e) {
+            $this->reset('current_password', 'password', 'password_confirmation');
+            throw $e;
+        }
+
+        Auth::user()->update([
+            'password' => $validated['password'],
+        ]);
+
+        $this->reset('current_password', 'password', 'password_confirmation');
+        session()->flash('passwordMessage', 'Contraseña actualizada correctamente');
     }
 
     public function deleteUser(Logout $logout): void

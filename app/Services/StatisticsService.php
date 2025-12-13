@@ -99,4 +99,93 @@ class StatisticsService
 
         return $habitLogs;
     }
+
+    /**
+     * Get weekly statistics for habits
+     */
+    public function getWeeklyStats(User $user): array
+    {
+        $weekStart = now()->startOfWeek();
+        $weekEnd = now()->endOfWeek();
+
+        // Get habit logs for this week
+        $weekLogs = $user->habitLogs()
+            ->whereBetween('completed_date', [$weekStart, $weekEnd])
+            ->get();
+
+        $totalCompleted = $weekLogs->count();
+        $totalPoints = $weekLogs->sum('points_earned');
+
+        // Daily breakdown
+        $dailyStats = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $weekStart->copy()->addDays($i);
+            $dayLogs = $weekLogs->filter(fn($log) => $log->completed_date->isSameDay($date));
+            
+            $dailyStats[$date->format('Y-m-d')] = [
+                'date' => $date,
+                'day_name' => $date->format('D'),
+                'completed' => $dayLogs->count(),
+                'points' => $dayLogs->sum('points_earned'),
+            ];
+        }
+
+        // Calculate completion rate
+        $scheduledHabits = $user->habits()
+            ->where('is_active', true)
+            ->get();
+
+        $totalScheduled = 0;
+        foreach ($dailyStats as $dateKey => $stats) {
+            $date = \Carbon\Carbon::parse($dateKey);
+            $scheduled = $scheduledHabits->filter(fn($h) => $h->isScheduledForDay($date))->count();
+            $totalScheduled += $scheduled;
+        }
+
+        $completionRate = $totalScheduled > 0 ? round(($totalCompleted / $totalScheduled) * 100, 1) : 0;
+
+        return [
+            'total_completed' => $totalCompleted,
+            'total_points' => $totalPoints,
+            'completion_rate' => $completionRate,
+            'daily_stats' => $dailyStats,
+            'average_per_day' => round($totalCompleted / 7, 1),
+        ];
+    }
+
+    /**
+     * Get monthly statistics for habits
+     */
+    public function getMonthlyStats(User $user): array
+    {
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+
+        $monthLogs = $user->habitLogs()
+            ->whereBetween('completed_date', [$monthStart, $monthEnd])
+            ->get();
+
+        $totalCompleted = $monthLogs->count();
+        $totalPoints = $monthLogs->sum('points_earned');
+
+        // Weekly breakdown
+        $weeklyStats = $monthLogs->groupBy(function($log) {
+            return $log->completed_date->weekOfMonth;
+        })->map(function($weekLogs) {
+            return [
+                'completed' => $weekLogs->count(),
+                'points' => $weekLogs->sum('points_earned'),
+            ];
+        });
+
+        $daysInMonth = now()->daysInMonth;
+        $daysPassed = now()->day;
+
+        return [
+            'total_completed' => $totalCompleted,
+            'total_points' => $totalPoints,
+            'weekly_stats' => $weeklyStats,
+            'average_per_day' => $daysPassed > 0 ? round($totalCompleted / $daysPassed, 1) : 0,
+        ];
+    }
 }

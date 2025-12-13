@@ -2,55 +2,48 @@
 
 namespace App\Policies;
 
-use App\Models\{User, Category};
+use App\Models\Category;
+use App\Models\User;
 
 class CategoryPolicy
 {
     /**
-     * Determine if the user can view any categories.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        // For now, all authenticated users can view categories
-        // In the future, this could be restricted to admins only
         return true;
     }
 
     /**
-     * Determine if the user can view the category.
+     * Determine whether the user can view the model.
      */
     public function view(User $user, Category $category): bool
     {
-        return true;
+        return $user->id === $category->user_id;
     }
 
     /**
-     * Determine if the user can create categories.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        // For now, all authenticated users can create categories
-        // In the future, this could be restricted to admins only
         return true;
     }
 
     /**
-     * Determine if the user can update the category.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, Category $category): bool
     {
-        // For now, all authenticated users can update categories
-        // In the future, this could be restricted to admins only
-        return true;
+        return $user->id === $category->user_id;
     }
 
     /**
-     * Determine if the user can delete the category.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, Category $category): bool
     {
-        // For now, all authenticated users can delete categories
-        // In the future, this could be restricted to admins only
-        return true;
+        return $user->id === $category->user_id;
     }
 }

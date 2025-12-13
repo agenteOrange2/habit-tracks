@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -11,7 +12,9 @@ use Illuminate\Support\Str;
 class Difficulty extends Model
 {
     use HasFactory;
+
     protected $fillable = [
+        'user_id',
         'name',
         'slug',
         'points',
@@ -26,11 +29,13 @@ class Difficulty extends Model
         'points' => 'integer',
     ];
 
-    protected static function boot()
+    protected static function booted(): void
     {
-        parent::boot();
-
+        // Auto-assign user_id on creation
         static::creating(function ($difficulty) {
+            if (empty($difficulty->user_id) && auth()->check()) {
+                $difficulty->user_id = auth()->id();
+            }
             if (empty($difficulty->slug)) {
                 $difficulty->slug = Str::slug($difficulty->name);
             }
@@ -41,9 +46,21 @@ class Difficulty extends Model
                 $difficulty->slug = Str::slug($difficulty->name);
             }
         });
+
+        // Global scope to filter by authenticated user
+        static::addGlobalScope('user', function (Builder $builder) {
+            if (auth()->check()) {
+                $builder->where('difficulties.user_id', auth()->id());
+            }
+        });
     }
 
     // Relationships
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function habits(): HasMany
     {
         return $this->hasMany(Habit::class);
@@ -63,6 +80,11 @@ class Difficulty extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order', 'asc');
+    }
+
+    public function scopeForUser(Builder $query, ?int $userId = null): Builder
+    {
+        return $query->where('user_id', $userId ?? auth()->id());
     }
 
     // Methods

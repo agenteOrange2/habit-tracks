@@ -48,6 +48,12 @@ class GoogleCalendarService
             throw new \Exception('Failed to fetch access token: ' . $token['error_description'] ?? $token['error']);
         }
 
+        // Clear google_event_id from all user's events when connecting a new Google account
+        // This prevents 404 errors when trying to update events that were synced to a different account
+        \App\Models\CalendarEvent::where('user_id', $user->id)
+            ->whereNotNull('google_event_id')
+            ->update(['google_event_id' => null]);
+
         return GoogleCalendarToken::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -198,7 +204,9 @@ class GoogleCalendarService
     public function updateEvent(CalendarEvent $event): bool
     {
         if (!$event->google_event_id) {
-            return false;
+            // No google_event_id means we need to create it instead
+            $newId = $this->createEvent($event);
+            return $newId !== null;
         }
 
         $service = $this->getCalendarService($event->user);
@@ -214,6 +222,25 @@ class GoogleCalendarService
             $service->events->update($calendarId, $event->google_event_id, $googleEvent);
             
             return true;
+        } catch (\Google\Service\Exception $e) {
+            // If event not found (404) or deleted (410), create a new one instead
+            if ($e->getCode() === 404 || $e->getCode() === 410) {
+                Log::info('Google Calendar event not found or deleted, creating new one', [
+                    'event_id' => $event->id,
+                    'old_google_event_id' => $event->google_event_id,
+                    'error_code' => $e->getCode(),
+                ]);
+                $event->update(['google_event_id' => null]);
+                $newId = $this->createEvent($event);
+                return $newId !== null;
+            }
+            
+            Log::error('Failed to update Google Calendar event: ' . $e->getMessage(), [
+                'event_id' => $event->id,
+                'google_event_id' => $event->google_event_id,
+                'user_id' => $event->user_id,
+            ]);
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Failed to update Google Calendar event: ' . $e->getMessage(), [
                 'event_id' => $event->id,
@@ -246,8 +273,8 @@ class GoogleCalendarService
             
             return true;
         } catch (\Google\Service\Exception $e) {
-            // If event not found (404), consider it deleted
-            if ($e->getCode() === 404) {
+            // If event not found (404) or already deleted (410), consider it deleted
+            if ($e->getCode() === 404 || $e->getCode() === 410) {
                 return true;
             }
             
@@ -339,7 +366,10 @@ class GoogleCalendarService
         }
 
         if ($event->recurrence_end) {
-            $rule .= ';UNTIL=' . $event->recurrence_end->format('Ymd\THis\Z');
+            // Use date format without time - adds 1 day to include the full last day
+            // Google's UNTIL is exclusive, so we add a day to make it inclusive
+            $endDate = $event->recurrence_end->copy()->addDay();
+            $rule .= ';UNTIL=' . $endDate->format('Ymd');
         }
 
         return $rule;
