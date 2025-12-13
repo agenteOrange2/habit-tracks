@@ -30,12 +30,12 @@
                     :current="request()->routeIs('admin.pomodoro.*')" wire:navigate>Pomodoro</flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('notes.index')"
                     :current="request()->routeIs('notes.*')" wire:navigate>Notas</flux:navlist.item>
-            </flux:navlist.group>
-
-            <flux:navlist.group :heading="__('System')" class="grid">
-                <flux:navlist.item icon="chart-bar" href="#" wire:navigate>Estadísticas</flux:navlist.item>
-                <flux:navlist.item icon="cog" :href="route('admin.settings.profile')"
-                    :current="request()->routeIs('admin.settings.*')" wire:navigate>Configuración</flux:navlist.item>
+                <flux:navlist.item icon="book-open" :href="route('admin.journal.index')"
+                    :current="request()->routeIs('admin.journal.*')" wire:navigate>Diario</flux:navlist.item>
+                <flux:navlist.item icon="calendar-days" :href="route('admin.calendar.index')"
+                    :current="request()->routeIs('admin.calendar.*')" wire:navigate>Calendario</flux:navlist.item>
+                <flux:navlist.item icon="gift" :href="route('rewards.index')"
+                    :current="request()->routeIs('rewards.*')" wire:navigate>Recompensas</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
@@ -96,18 +96,6 @@
         @endauth
         --}}
         <flux:spacer />
-
-        <flux:navlist variant="outline">
-            <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit"
-                target="_blank">
-                {{ __('Repository') }}
-            </flux:navlist.item>
-
-            <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire"
-                target="_blank">
-                {{ __('Documentation') }}
-            </flux:navlist.item>
-        </flux:navlist>
 
         <!-- Desktop User Menu -->
         <flux:dropdown class="hidden lg:block" position="bottom" align="start">

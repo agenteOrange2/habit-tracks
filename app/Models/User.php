@@ -26,7 +26,12 @@ class User extends Authenticatable
         'password',
         'theme_id',
         'energy_level',
-        'last_energy_update'
+        'last_energy_update',
+        'avatar_seed',
+        'avatar_style',
+        'custom_avatar',
+        'player_class',
+        'cover_image',
     ];
 
     /**
@@ -65,6 +70,49 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the user's avatar URL (custom or DiceBear)
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        // If user has a custom avatar, use it
+        if ($this->custom_avatar) {
+            return asset('storage/' . $this->custom_avatar);
+        }
+        
+        // Otherwise use DiceBear
+        $seed = $this->avatar_seed ?? $this->email;
+        $style = $this->avatar_style ?? 'notionists';
+        return "https://api.dicebear.com/7.x/{$style}/svg?seed={$seed}";
+    }
+
+    /**
+     * Get the user's cover image URL
+     */
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        if ($this->cover_image) {
+            return asset('storage/' . $this->cover_image);
+        }
+        return null;
+    }
+
+    /**
+     * Get player class configuration
+     */
+    public function getPlayerClassConfigAttribute(): array
+    {
+        $classes = [
+            'guerrero' => ['name' => 'Guerrero', 'icon' => '⚔️', 'bg' => 'bg-red-100', 'text' => 'text-red-700'],
+            'mago' => ['name' => 'Mago', 'icon' => '🔮', 'bg' => 'bg-purple-100', 'text' => 'text-purple-700'],
+            'sanador' => ['name' => 'Sanador', 'icon' => '🌿', 'bg' => 'bg-green-100', 'text' => 'text-green-700'],
+            'arquero' => ['name' => 'Arquero', 'icon' => '🏹', 'bg' => 'bg-yellow-100', 'text' => 'text-yellow-700'],
+            'programador' => ['name' => 'Programador', 'icon' => '💻', 'bg' => 'bg-blue-100', 'text' => 'text-blue-700'],
+        ];
+
+        return $classes[$this->player_class ?? 'programador'] ?? $classes['programador'];
     }
 
 
@@ -155,10 +203,20 @@ class User extends Authenticatable
         return $this->hasMany(NoteTag::class);
     }
 
-    /* Journal */
-    public function journalEntries(): HasMany
+    /* Calendar */
+    public function calendarEvents(): HasMany
     {
-        return $this->hasMany(JournalEntry::class);
+        return $this->hasMany(CalendarEvent::class);
+    }
+
+    public function calendarSetting(): HasOne
+    {
+        return $this->hasOne(CalendarSetting::class);
+    }
+
+    public function googleCalendarToken(): HasOne
+    {
+        return $this->hasOne(GoogleCalendarToken::class);
     }
 
     /**

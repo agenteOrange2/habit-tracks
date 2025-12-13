@@ -77,9 +77,12 @@ Route::get('/rewards/stats', App\Livewire\Rewards\RewardStats::class)
     ->name('rewards.stats');
 
 // Journal
-Route::get('/journal/create', function () {
-    return redirect()->route('admin.dashboard')->with('info', 'Función de diario próximamente disponible');
-})->name('admin.journal.create');
+Route::get('/journal', App\Livewire\Journal\JournalList::class)
+    ->name('admin.journal.index');
+Route::get('/journal/create', App\Livewire\Journal\JournalEditor::class)
+    ->name('admin.journal.create');
+Route::get('/journal/{entry}/edit', App\Livewire\Journal\JournalEditor::class)
+    ->name('admin.journal.edit');
 
 // Notes System
 Route::get('/notes', App\Livewire\Notes\NotesList::class)
@@ -94,3 +97,23 @@ Route::get('/notes/folders', App\Livewire\Notes\FolderManager::class)
     ->name('notes.folders');
 Route::get('/notes/tags', App\Livewire\Notes\TagManager::class)
     ->name('notes.tags');
+
+// Calendar System
+Route::get('/calendar', App\Livewire\Calendar\CalendarView::class)
+    ->name('admin.calendar.index');
+Route::get('/calendar/create', App\Livewire\Calendar\EventEditor::class)
+    ->name('admin.calendar.create');
+Route::get('/calendar/{event}/edit', App\Livewire\Calendar\EventEditor::class)
+    ->name('admin.calendar.edit');
+Route::get('/calendar/settings', App\Livewire\Calendar\CalendarSettings::class)
+    ->name('admin.calendar.settings');
+Route::get('/calendar/google/connect', function () {
+    // Check if Google credentials are configured
+    if (empty(config('google.client_id')) || empty(config('google.client_secret'))) {
+        return redirect()->route('admin.calendar.settings')
+            ->with('error', 'Las credenciales de Google Calendar no están configuradas. Configura GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET en tu archivo .env');
+    }
+    
+    $googleService = app(\App\Services\GoogleCalendarService::class);
+    return redirect()->away($googleService->getAuthUrl());
+})->name('admin.calendar.google.connect');
