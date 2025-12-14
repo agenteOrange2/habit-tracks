@@ -295,46 +295,88 @@ class PomodoroTimer extends Component
     {
         try {
             $session = PomodoroSession::find($sessionId);
-            
+
             if (!$session || !$session->canBeResumed()) {
                 session()->flash('error', 'Esta sesión no puede ser reanudada');
                 return;
             }
-            
+
             $pomodoroService = app(PomodoroService::class);
             $user = Auth::user();
-            
+
             // Check if user can start session
             if (!$pomodoroService->canStartSession($user)) {
                 session()->flash('error', '⚡ No tienes suficiente energía. Descansa un poco.');
                 $this->loadInitialData();
                 return;
             }
-            
+
             // Calculate remaining minutes (round up)
             $remainingMinutes = ceil($session->remaining_seconds / 60);
-            
+
             // Resume the session
             $resumedSession = $pomodoroService->resumeSession($session, $remainingMinutes);
-            
+
             $this->currentSessionId = $resumedSession->id;
             $this->selectedHabit = $session->habit_id;
             $this->duration = $remainingMinutes;
             $this->timerState = 'running';
             $this->remainingSeconds = $session->remaining_seconds;
-            
+
             session()->flash('success', '↻ Sesión reanudada desde ' . $remainingMinutes . ' minutos');
-            
+
             $this->dispatch('timerStarted', remainingSeconds: $this->remainingSeconds);
             $this->loadInitialData();
-            
+            $this->loadRecentSessions();
+
         } catch (\Exception $e) {
             Log::error('Failed to resume session', [
                 'session_id' => $sessionId,
                 'error' => $e->getMessage(),
             ]);
-            
+
             session()->flash('error', 'Error al reanudar la sesión: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteSession(int $sessionId): void
+    {
+        try {
+            $session = PomodoroSession::find($sessionId);
+
+            if (!$session) {
+                session()->flash('error', 'Sesión no encontrada');
+                return;
+            }
+
+            // Verificar que la sesión pertenece al usuario
+            if ($session->user_id !== Auth::id()) {
+                session()->flash('error', 'No tienes permiso para eliminar esta sesión');
+                return;
+            }
+
+            // No permitir eliminar sesión en curso
+            if ($session->id === $this->currentSessionId) {
+                session()->flash('error', 'No puedes eliminar una sesión en curso');
+                return;
+            }
+
+            // Eliminar la sesión
+            $session->delete();
+
+            session()->flash('success', '🗑️ Sesión eliminada correctamente');
+
+            // Recargar las sesiones
+            $this->loadRecentSessions();
+            $this->loadInitialData();
+
+        } catch (\Exception $e) {
+            Log::error('Failed to delete session', [
+                'session_id' => $sessionId,
+                'error' => $e->getMessage(),
+            ]);
+
+            session()->flash('error', 'Error al eliminar la sesión: ' . $e->getMessage());
         }
     }
 
@@ -347,38 +389,50 @@ class PomodoroTimer extends Component
         try {
             $session = PomodoroSession::find($this->currentSessionId);
             $pomodoroService = app(PomodoroService::class);
-            
+
             if ($session) {
                 $pomodoroService->completeSession($session);
             }
 
             $this->timerState = 'completed';
-            
+
             // Check if it was a break or Pomodoro
             $isBreak = $this->breakType !== '';
-            
+
             if ($isBreak) {
                 // Break completed
                 if ($this->breakType === 'long_break') {
                     $pomodoroService->resetCycle(Auth::user());
-                    session()->flash('success', '✨ ¡Descanso largo completado! Ciclo reiniciado.');
+                    session()->flash('success', '✨ ¡Descanso largo completado! Ciclo reiniciado. Listo para un nuevo Pomodoro.');
                 } else {
                     session()->flash('success', '☕ ¡Descanso corto completado! Listo para continuar.');
                 }
-                
+
                 $this->breakType = '';
                 $this->resetTimer();
+                $this->loadInitialData();
             } else {
-                // Pomodoro completed
+                // Pomodoro completed - ANTES de incrementar, obtenemos el ciclo actual
+                $currentCycleInfo = $pomodoroService->getActiveCycle(Auth::user(), $this->maxCycles);
+                $currentCycle = $currentCycleInfo['cycle_count'];
+
+                // Ahora incrementamos el ciclo
                 $pomodoroService->incrementCycle(Auth::user());
-                
+
+                // Verificamos si llegamos al máximo de ciclos
+                $shouldTakeLongBreak = ($currentCycle + 1) >= $this->maxCycles;
+
                 session()->flash('success', '🍅 ¡Pomodoro completado! Has ganado ' . $this->duration . ' minutos de tiempo enfocado.');
-                
-                // Determine break type based on cycle and maxCycles
-                $cycleInfo = $pomodoroService->getActiveCycle(Auth::user(), $this->maxCycles);
-                $breakType = $cycleInfo['next_break_type'];
-                $breakDuration = $cycleInfo['next_break_duration'];
-                
+
+                // Determinar el tipo de descanso
+                $breakType = $shouldTakeLongBreak ? 'long_break' : 'short_break';
+                $breakDuration = $shouldTakeLongBreak
+                    ? $this->userSettings['long_break_duration']
+                    : $this->userSettings['short_break_duration'];
+
+                // Refresh data antes de decidir si auto-iniciar
+                $this->loadInitialData();
+
                 // Auto-start break if enabled
                 if ($this->userSettings['auto_start_breaks']) {
                     $this->startBreak($breakType, $breakDuration);
@@ -386,9 +440,6 @@ class PomodoroTimer extends Component
                     $this->resetTimer();
                 }
             }
-
-            // Refresh data
-            $this->loadInitialData();
 
             // Dispatch events
             $this->dispatch('energyUpdated');
@@ -399,7 +450,7 @@ class PomodoroTimer extends Component
                 'session_id' => $this->currentSessionId,
                 'error' => $e->getMessage(),
             ]);
-            
+
             session()->flash('error', 'Error al completar el Pomodoro');
         }
     }
@@ -448,29 +499,39 @@ class PomodoroTimer extends Component
         if ($this->breakType === '') {
             return; // Not in a break
         }
-        
+
         try {
+            $wasLongBreak = $this->breakType === 'long_break';
+
             // Stop the break session
             if ($this->currentSessionId) {
                 $session = PomodoroSession::find($this->currentSessionId);
                 if ($session) {
                     $pomodoroService = app(PomodoroService::class);
                     $pomodoroService->interruptSession($session);
+
+                    // Si era un descanso largo, resetear el ciclo
+                    if ($wasLongBreak) {
+                        $pomodoroService->resetCycle(Auth::user());
+                        session()->flash('info', 'Descanso largo omitido. Ciclo reiniciado.');
+                    } else {
+                        session()->flash('info', 'Descanso corto omitido');
+                    }
                 }
             }
-            
+
             $this->breakType = '';
             $this->resetTimer();
-            
-            session()->flash('info', 'Descanso omitido');
+            $this->loadInitialData();
+
             $this->dispatch('breakSkipped');
-            
+
         } catch (\Exception $e) {
             Log::error('Failed to skip break', [
                 'session_id' => $this->currentSessionId,
                 'error' => $e->getMessage(),
             ]);
-            
+
             session()->flash('error', 'Error al omitir el descanso');
         }
     }

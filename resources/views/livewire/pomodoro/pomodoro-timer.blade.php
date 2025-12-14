@@ -485,6 +485,7 @@
                             <th class="px-4 py-2 font-medium">Hábito</th>
                             <th class="px-4 py-2 font-medium w-24">Estado</th>
                             <th class="px-4 py-2 font-medium w-24 text-right">Duración</th>
+                            <th class="px-4 py-2 font-medium w-28 text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y divide-[#F1F1EF]">
@@ -504,10 +505,29 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right text-[#9B9A97]">{{ $session['duration'] }} min</td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-1">
+                                        @if($session['can_resume'] && $timerState === 'idle')
+                                            <button wire:click="resumeSession({{ $session['id'] }})"
+                                                    class="px-2 py-1 text-[10px] font-medium text-[#2383E2] hover:bg-[#E7F3F8] rounded transition"
+                                                    title="Reanudar sesión">
+                                                ↻ Reanudar
+                                            </button>
+                                        @endif
+                                        @if($session['was_interrupted'])
+                                            <button wire:click="deleteSession({{ $session['id'] }})"
+                                                    wire:confirm="¿Estás seguro de eliminar esta sesión?"
+                                                    class="px-2 py-1 text-[10px] font-medium text-[#EB5757] hover:bg-[#FCE8E6] rounded transition"
+                                                    title="Eliminar sesión">
+                                                🗑️
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-4 py-8 text-center text-gray-400 text-xs">
+                                <td colspan="4" class="px-4 py-8 text-center text-gray-400 text-xs">
                                     <div class="text-xl mb-2">🍅</div>
                                     No hay sesiones hoy. ¡Empieza una!
                                 </td>

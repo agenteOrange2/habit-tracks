@@ -152,7 +152,7 @@
                                     <option value="">Selecciona una dificultad</option>
                                     @foreach($difficulties as $diff)
                                         <option value="{{ $diff->id }}" {{ !$diff->is_active ? 'class=text-gray-400' : '' }}>
-                                            {{ $diff->icon }} {{ $diff->name }} ({{ $diff->points }} pts){{ !$diff->is_active ? ' (Obsoleta)' : '' }}
+                                            {{ $diff->icon }} {{ $diff->name }} — {{ $diff->points }} XP{{ !$diff->is_active ? ' (Obsoleta)' : '' }}
                                         </option>
                                     @endforeach
                                 </select>

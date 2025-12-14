@@ -84,11 +84,12 @@
                         <span>Nivel & XP</span>
                     </div>
                     <div class="flex-1 flex items-center gap-3">
-                        <span class="text-sm font-mono bg-zinc-100 dark:bg-zinc-700 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">LVL {{ $this->userLevel->level ?? 1 }}</span>
+                        <span class="text-sm font-mono bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded text-amber-700 dark:text-amber-300 font-bold">LVL {{ $this->userLevel->current_level ?? 1 }}</span>
                         <div class="w-48 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden relative group">
-                            @php $xp = $this->userLevel->experience ?? 0; $nextLevel = ($this->userLevel->level ?? 1) * 1000; $progress = min(100, ($xp / $nextLevel) * 100); @endphp
-                            <div class="h-full bg-zinc-800 dark:bg-zinc-300 rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                            <div class="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full transition-all duration-500" style="width: {{ min(100, $this->userLevel->progress_percentage ?? 0) }}%"></div>
                         </div>
+                        <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $this->userLevel->current_xp ?? 0 }}/{{ $this->userLevel->required_xp ?? 100 }} XP</span>
+                        <a href="{{ route('admin.xp-history') }}" wire:navigate class="text-xs text-amber-600 dark:text-amber-400 hover:underline">Ver historial →</a>
                     </div>
                 </div>
                 @endif

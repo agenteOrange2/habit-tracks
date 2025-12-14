@@ -121,7 +121,7 @@
                                     class="w-full bg-white border border-[rgba(55,53,47,0.16)] rounded px-3 py-2 text-sm text-[#37352F] transition-all hover:border-[rgba(55,53,47,0.3)] focus:border-[#2383E2] focus:ring-2 focus:ring-[rgba(35,131,226,0.2)] outline-none appearance-none cursor-pointer">
                                     <option value="">Selecciona una dificultad</option>
                                     @foreach($difficulties as $diff)
-                                        <option value="{{ $diff->id }}">{{ $diff->icon }} {{ $diff->name }} ({{ $diff->points }} pts)</option>
+                                        <option value="{{ $diff->id }}">{{ $diff->icon }} {{ $diff->name }} — {{ $diff->points }} XP</option>
                                     @endforeach
                                 </select>
                                 <div class="absolute right-3 top-3 pointer-events-none text-gray-400">

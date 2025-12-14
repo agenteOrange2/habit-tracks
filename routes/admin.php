@@ -40,6 +40,10 @@ Route::get('/categories', App\Livewire\Admin\Categories\CategoryList::class)
 Route::get('/difficulties', App\Livewire\Admin\Difficulties\DifficultyList::class)
     ->name('admin.difficulties.index');
 
+// XP History
+Route::get('/xp-history', App\Livewire\XPHistoryPage::class)
+    ->name('admin.xp-history');
+
 // Settings
 Route::redirect('/settings', '/admin/settings/profile');
 

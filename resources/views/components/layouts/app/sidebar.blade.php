@@ -145,6 +145,13 @@
         --}}
         <flux:spacer />
 
+        {{-- Level Badge (Desktop) --}}
+        @auth
+            <div class="px-4 mb-4">
+                <livewire:level-badge />
+            </div>
+        @endauth
+
         <!-- Desktop User Menu -->
         <flux:dropdown class="hidden lg:block" position="bottom" align="start">
             <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
@@ -192,6 +199,11 @@
     <flux:header class="lg:hidden">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
+        {{-- Level Badge --}}
+        @auth
+            <livewire:level-badge />
+        @endauth
+
         <flux:spacer />
 
         <flux:dropdown position="top" align="end">
@@ -236,6 +248,11 @@
     </flux:header>
 
     {{ $slot }}
+
+    {{-- Level Up Modal --}}
+    @auth
+        <livewire:level-up-modal />
+    @endauth
 
     <!-- Floating Timer Widget - DISABLED (too complex, using sidebar timer instead) -->
     {{-- @auth

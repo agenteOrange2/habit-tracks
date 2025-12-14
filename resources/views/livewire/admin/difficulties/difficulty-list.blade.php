@@ -42,7 +42,7 @@
                 {{-- Table Header --}}
                 <div class="flex text-[11px] font-semibold text-[#9B9A97] uppercase tracking-wide bg-[#F7F7F5] border-b border-[#E9E9E7]">
                     <div class="flex-1 px-4 py-2 border-r border-[#E9E9E7]">Nombre de Dificultad</div>
-                    <div class="w-32 px-4 py-2 border-r border-[#E9E9E7] text-center">Puntos</div>
+                    <div class="w-32 px-4 py-2 border-r border-[#E9E9E7] text-center">XP Reward</div>
                     <div class="w-32 px-4 py-2 border-r border-[#E9E9E7] text-center">Hábitos</div>
                     <div class="w-24 px-4 py-2 text-center">Estado</div>
                     <div class="w-24 px-4 py-2 text-center">Acciones</div>
@@ -59,10 +59,10 @@
                             <span class="font-medium">{{ $difficulty->name }}</span>
                         </div>
                         
-                        {{-- Points Column --}}
+                        {{-- Points/XP Column --}}
                         <div class="w-32 px-4 text-center">
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-[#2383E2]/10 text-[#2383E2]">
-                                {{ $difficulty->points }} pts
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-700">
+                                ⭐ {{ $difficulty->points }} XP
                             </span>
                         </div>
                         

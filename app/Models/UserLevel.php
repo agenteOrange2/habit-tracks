@@ -49,4 +49,50 @@ class UserLevel extends Model
             default => 'Principiante 🌱',
         };
     }
+
+    public function getMilestoneBadgesAttribute(): array
+    {
+        $milestones = [10, 25, 50, 75, 100];
+        $badges = [];
+
+        foreach ($milestones as $milestone) {
+            $badges[] = [
+                'level' => $milestone,
+                'icon' => $this->getMilestoneIcon($milestone),
+                'name' => $this->getMilestoneName($milestone),
+                'achieved' => $this->current_level >= $milestone,
+            ];
+        }
+
+        return $badges;
+    }
+
+    public function getAchievedBadgesAttribute(): array
+    {
+        return array_filter($this->milestone_badges, fn($badge) => $badge['achieved']);
+    }
+
+    private function getMilestoneIcon(int $level): string
+    {
+        return match ($level) {
+            10 => '🥉',
+            25 => '🥈',
+            50 => '🥇',
+            75 => '💎',
+            100 => '👑',
+            default => '⭐',
+        };
+    }
+
+    private function getMilestoneName(int $level): string
+    {
+        return match ($level) {
+            10 => 'Iniciado',
+            25 => 'Dedicado',
+            50 => 'Experto',
+            75 => 'Maestro',
+            100 => 'Leyenda',
+            default => "Nivel $level",
+        };
+    }
 }
