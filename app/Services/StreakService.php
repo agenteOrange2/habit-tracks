@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\{User, Habit, HabitLog};
+use App\Enums\AchievementType;
 use Carbon\Carbon;
 
 class StreakService
@@ -13,24 +14,33 @@ class StreakService
         $wasCompletedYesterday = $habit->logs()
             ->whereDate('completed_date', $yesterday)
             ->exists();
-        
+
         if ($wasCompletedYesterday) {
             $habit->increment('current_streak');
         } else {
             $daysAgo = $this->getLastCompletionDaysAgo($habit);
-            
+
             if ($daysAgo > 1) {
                 $habit->current_streak = 1;
             } else {
                 $habit->increment('current_streak');
             }
         }
-        
+
         if ($habit->current_streak > $habit->best_streak) {
             $habit->best_streak = $habit->current_streak;
         }
-        
+
         $habit->save();
+
+        // Verificar logros de racha
+        $this->checkStreakAchievements($habit->user, $habit->current_streak);
+    }
+
+    private function checkStreakAchievements(User $user, int $streak): void
+    {
+        $achievementService = app(AchievementService::class);
+        $achievementService->checkAndUnlock($user, AchievementType::HABIT_STREAK, $streak);
     }
     
     private function getLastCompletionDaysAgo(Habit $habit): int

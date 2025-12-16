@@ -62,8 +62,18 @@ class PointsService
             $totalPoints += $pomodoroBonus;
         }
         
-        // Bonus por completar todos los hábitos del día
-        if ($this->checkDailyCompletion($user)) {
+        // Bonus por completar todos los hábitos del día (solo una vez por día)
+        $dailyCompletionCheck = $this->checkDailyCompletion($user);
+        $hasBonus = $this->hasReceivedDailyCompletionBonus($user);
+
+        \Log::info('Daily completion bonus check', [
+            'user_id' => $user->id,
+            'daily_completion_check' => $dailyCompletionCheck,
+            'has_received_bonus' => $hasBonus,
+            'will_award_bonus' => $dailyCompletionCheck && !$hasBonus,
+        ]);
+
+        if ($dailyCompletionCheck && !$hasBonus) {
             $dailyBonus = 50;
             $this->levelService->awardXP(
                 $user,
@@ -73,6 +83,11 @@ class PointsService
                 '¡Todos los hábitos del día completados!'
             );
             $totalPoints += $dailyBonus;
+
+            \Log::info('Daily completion bonus awarded', [
+                'user_id' => $user->id,
+                'bonus_amount' => $dailyBonus,
+            ]);
         }
         
         // Bonus por first time today (motivación temprana)
@@ -87,13 +102,11 @@ class PointsService
             );
             $totalPoints += $earlyBirdBonus;
         }
-        
-        // Update user stats
-        $user->stats->increment('total_points', $totalPoints);
-        $user->stats->increment('available_points', $totalPoints);
-        $user->stats->increment('weekly_points', $totalPoints);
-        $user->stats->increment('monthly_points', $totalPoints);
-        
+
+        // NOTE: Ya NO actualizamos user->stats aquí porque LevelService::awardXP
+        // ya registra las transacciones de XP. Los stats deben calcularse
+        // desde las XPTransactions para evitar duplicación.
+
         return $totalPoints;
     }
     
@@ -115,21 +128,50 @@ class PointsService
             ->where('is_active', true)
             ->get()
             ->filter->isScheduledForToday();
-            
+
         $completedToday = $scheduledToday->filter->isCompletedToday();
-        
-        return $scheduledToday->count() > 0 && 
+
+        \Log::info('Daily completion check', [
+            'user_id' => $user->id,
+            'scheduled_count' => $scheduledToday->count(),
+            'completed_count' => $completedToday->count(),
+            'scheduled_ids' => $scheduledToday->pluck('id')->toArray(),
+            'completed_ids' => $completedToday->pluck('id')->toArray(),
+        ]);
+
+        return $scheduledToday->count() > 0 &&
                $scheduledToday->count() === $completedToday->count();
+    }
+
+    private function hasReceivedDailyCompletionBonus(User $user): bool
+    {
+        return XPTransaction::where('user_id', $user->id)
+            ->where('source_type', XPTransaction::SOURCE_DAILY_COMPLETION)
+            ->whereDate('created_at', today())
+            ->exists();
     }
     
     public function spendPoints(User $user, int $amount): bool
     {
-        if (!$user->stats || $user->stats->available_points < $amount) {
-            return false;
-        }
-        
-        $user->stats->decrement('available_points', $amount);
-        return true;
+        return $this->spendPointsSafely($user, $amount);
+    }
+    
+    /**
+     * Spend points with database lock to prevent race conditions
+     */
+    public function spendPointsSafely(User $user, int $amount): bool
+    {
+        return \DB::transaction(function () use ($user, $amount) {
+            // Lock the stats row to prevent race conditions
+            $stats = $user->stats()->lockForUpdate()->first();
+            
+            if (!$stats || $stats->available_points < $amount) {
+                return false;
+            }
+            
+            $stats->decrement('available_points', $amount);
+            return true;
+        });
     }
 
     private function ensureUserHasStats(User $user): void

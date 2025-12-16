@@ -136,6 +136,7 @@ class RewardShop extends Component
             session()->flash('success', "🎉 ¡Disfruta tu recompensa: {$reward->name}!");
 
             $this->dispatch('rewardClaimed');
+            $this->dispatch('pointsUpdated');
         } else {
             session()->flash('error', '❌ Error al procesar el canje. Intenta de nuevo.');
         }

@@ -77,13 +77,19 @@ class Profile extends Component
     #[Computed]
     public function currentAvatarUrl(): string
     {
-        // If there's a custom avatar uploaded, use it
-        if ($this->custom_avatar) {
-            return asset('storage/' . $this->custom_avatar);
+        // If user selected a gallery avatar, use DiceBear
+        if ($this->avatar_seed) {
+            return "https://api.dicebear.com/7.x/notionists/svg?seed={$this->avatar_seed}";
         }
-        // Otherwise use DiceBear
-        $seed = $this->avatar_seed ?? Auth::user()->email;
-        return "https://api.dicebear.com/7.x/notionists/svg?seed={$seed}";
+        
+        // If there's a custom avatar uploaded, use it
+        $customAvatar = Auth::user()->custom_avatar;
+        if ($customAvatar) {
+            return asset('storage/' . $customAvatar);
+        }
+        
+        // Default: use email as seed
+        return "https://api.dicebear.com/7.x/notionists/svg?seed=" . Auth::user()->email;
     }
 
     #[Computed]
@@ -110,8 +116,41 @@ class Profile extends Component
 
     public function selectAvatar(string $seed): void
     {
+        $user = Auth::user();
+        
+        // Update local state
         $this->avatar_seed = $seed;
-        $this->custom_avatar = null; // Clear custom avatar when selecting from catalog
+        
+        // Save to database
+        $user->avatar_seed = $seed;
+        $user->save();
+        
+        // Refresh user to ensure changes are persisted
+        $user->refresh();
+        
+        session()->flash('message', 'Apariencia actualizada correctamente');
+        $this->dispatch('profile-updated', name: $user->name);
+    }
+    
+    public function selectCustomAvatar(): void
+    {
+        $user = Auth::user();
+        
+        if ($user->custom_avatar) {
+            // Update local state
+            $this->custom_avatar = $user->custom_avatar;
+            $this->avatar_seed = null;
+            
+            // Save to database
+            $user->avatar_seed = null;
+            $user->save();
+            
+            // Refresh user
+            $user->refresh();
+            
+            session()->flash('message', 'Foto personalizada seleccionada');
+            $this->dispatch('profile-updated', name: $user->name);
+        }
     }
 
     public function selectClass(string $classId): void
@@ -132,8 +171,8 @@ class Profile extends Component
             Storage::disk('public')->delete($user->custom_avatar);
         }
 
-        // Store new avatar
-        $path = $this->newAvatar->store('avatars', 'public');
+        // Store new avatar in user-specific folder
+        $path = $this->newAvatar->store('avatars/' . $user->id, 'public');
         $this->custom_avatar = $path;
         $this->avatar_seed = null; // Clear seed when using custom avatar
         
@@ -145,6 +184,7 @@ class Profile extends Component
 
         $this->newAvatar = null;
         session()->flash('message', 'Avatar actualizado correctamente');
+        $this->dispatch('profile-updated', name: $user->name);
     }
 
     public function updatedNewCover(): void
@@ -160,8 +200,8 @@ class Profile extends Component
             Storage::disk('public')->delete($user->cover_image);
         }
 
-        // Store new cover
-        $path = $this->newCover->store('covers', 'public');
+        // Store new cover in user-specific folder
+        $path = $this->newCover->store('covers/' . $user->id, 'public');
         $this->cover_image = $path;
         
         // Save immediately
@@ -199,14 +239,14 @@ class Profile extends Component
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id),
             ],
-            'avatar_seed' => ['nullable', 'string', 'max:100'],
             'player_class' => ['required', 'string', 'in:guerrero,mago,sanador,arquero,programador'],
         ]);
 
+        // Only update name, email, and player_class
+        // avatar_seed is managed separately by selectAvatar() and selectCustomAvatar()
         $user->fill([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'avatar_seed' => $this->custom_avatar ? null : $validated['avatar_seed'],
             'player_class' => $validated['player_class'],
         ]);
 
@@ -272,6 +312,57 @@ class Profile extends Component
         tap($user, $logout(...))->delete();
 
         $this->redirect('/', navigate: true);
+    }
+
+    public function runOptimizeClear(): void
+    {
+        try {
+            \Artisan::call('optimize:clear');
+            session()->flash('message', 'Cache limpiada correctamente (optimize:clear)');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al limpiar cache: ' . $e->getMessage());
+        }
+    }
+
+    public function runStorageLink(): void
+    {
+        try {
+            \Artisan::call('storage:link');
+            session()->flash('message', 'Storage link creado correctamente');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al crear storage link: ' . $e->getMessage());
+        }
+    }
+
+    public function runCacheClear(): void
+    {
+        try {
+            \Artisan::call('cache:clear');
+            \Artisan::call('config:clear');
+            \Artisan::call('route:clear');
+            \Artisan::call('view:clear');
+            session()->flash('message', 'Todas las caches limpiadas correctamente');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al limpiar cache: ' . $e->getMessage());
+        }
+    }
+
+    #[\Livewire\Attributes\Computed]
+    public function debugInfo(): array
+    {
+        $user = Auth::user();
+        $habits = $user->habits()->select('id', 'name', 'user_id')->get();
+        
+        return [
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'habits_count' => $habits->count(),
+            'habits' => $habits->map(fn($h) => "ID:{$h->id} - {$h->name} (user_id:{$h->user_id})")->toArray(),
+            'app_url' => config('app.url'),
+            'app_env' => config('app.env'),
+            'livewire_url' => url('/livewire/update'),
+            'asset_url' => config('app.asset_url') ?? 'not set',
+        ];
     }
 
     public function render()

@@ -14,6 +14,7 @@ class JournalEntry extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
         'habit_log_id',
         'content',
         'mood',
@@ -29,6 +30,10 @@ class JournalEntry extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(JournalCategory::class, 'category_id');
+    }
 
     public function habitLog(): BelongsTo
     {

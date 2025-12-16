@@ -10,7 +10,7 @@
             };
         @endphp
         <a href="{{ route($action['route']) }}"
-            class="flex items-center gap-2 p-2 rounded {{ $colorClasses }} hover:opacity-80 transition text-left">
+            class="flex items-center gap-2 p-3 rounded {{ $colorClasses }} hover:opacity-80 transition-all duration-200 text-left">
             <span class="text-lg">{{ $action['icon'] }}</span>
             <span class="text-sm font-medium">{{ $action['title'] }}</span>
         </a>

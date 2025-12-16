@@ -158,6 +158,34 @@ class DifficultyList extends Component
             ]);
         }
     }
+    
+    public function moveUp(int $difficultyId): void
+    {
+        $difficulties = Difficulty::ordered()->get();
+        $currentIndex = $difficulties->search(fn($d) => $d->id === $difficultyId);
+        
+        if ($currentIndex > 0) {
+            $orderedIds = $difficulties->pluck('id')->toArray();
+            $temp = $orderedIds[$currentIndex];
+            $orderedIds[$currentIndex] = $orderedIds[$currentIndex - 1];
+            $orderedIds[$currentIndex - 1] = $temp;
+            $this->updateOrder($orderedIds);
+        }
+    }
+    
+    public function moveDown(int $difficultyId): void
+    {
+        $difficulties = Difficulty::ordered()->get();
+        $currentIndex = $difficulties->search(fn($d) => $d->id === $difficultyId);
+        
+        if ($currentIndex < $difficulties->count() - 1) {
+            $orderedIds = $difficulties->pluck('id')->toArray();
+            $temp = $orderedIds[$currentIndex];
+            $orderedIds[$currentIndex] = $orderedIds[$currentIndex + 1];
+            $orderedIds[$currentIndex + 1] = $temp;
+            $this->updateOrder($orderedIds);
+        }
+    }
 
     public function render()
     {

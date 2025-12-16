@@ -50,6 +50,12 @@ class LevelService
             // Update XP
             $level->increment('current_xp', $xp);
             $level->increment('total_xp', $xp);
+            
+            // Sync XP with available points (XP earned = points earned)
+            if ($user->stats) {
+                $user->stats->increment('available_points', $xp);
+                $user->stats->increment('total_points', $xp);
+            }
 
             // Check for level up
             $requiredXp = $this->getRequiredXPForLevel($level->current_level);

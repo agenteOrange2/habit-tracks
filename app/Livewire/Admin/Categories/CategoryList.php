@@ -159,6 +159,70 @@ class CategoryList extends Component
         }
     }
 
+    public function moveUp(int $categoryId): void
+    {
+        try {
+            $category = Category::findOrFail($categoryId);
+            
+            // Find the category above (with lower order value)
+            $categoryAbove = Category::where('order', '<', $category->order)
+                ->orderBy('order', 'desc')
+                ->first();
+            
+            if ($categoryAbove) {
+                // Swap order values
+                $tempOrder = $category->order;
+                $category->order = $categoryAbove->order;
+                $categoryAbove->order = $tempOrder;
+                
+                $category->save();
+                $categoryAbove->save();
+                
+                $this->dispatch('notification', [
+                    'type' => 'success',
+                    'message' => 'Orden actualizado correctamente'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'Error al mover la categoría'
+            ]);
+        }
+    }
+
+    public function moveDown(int $categoryId): void
+    {
+        try {
+            $category = Category::findOrFail($categoryId);
+            
+            // Find the category below (with higher order value)
+            $categoryBelow = Category::where('order', '>', $category->order)
+                ->orderBy('order', 'asc')
+                ->first();
+            
+            if ($categoryBelow) {
+                // Swap order values
+                $tempOrder = $category->order;
+                $category->order = $categoryBelow->order;
+                $categoryBelow->order = $tempOrder;
+                
+                $category->save();
+                $categoryBelow->save();
+                
+                $this->dispatch('notification', [
+                    'type' => 'success',
+                    'message' => 'Orden actualizado correctamente'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'Error al mover la categoría'
+            ]);
+        }
+    }
+
     public function render()
     {
         $categories = Category::query()

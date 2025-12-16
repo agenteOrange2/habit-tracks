@@ -10,9 +10,11 @@
         class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div
             class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-neutral-800">
-            <div class="absolute inset-0 bg-neutral-900"></div>
+            <div class="absolute inset-0 bg-neutral-900">
+                <img src="{{ asset('bg-cover/habit_track_cover_login_2.jpg') }}" alt="" class="w-full h-full object-cover opacity-40" />
+            </div>
             <a href="{{ route('home') }}" class="relative z-20 flex items-center text-lg font-medium" wire:navigate>
-                <span class="flex h-10 w-10 items-center justify-center rounded-md">
+                <span class="flex h-16 w-16 items-center justify-center rounded-md">
                     <x-app-logo-icon class="me-2 h-7 fill-current text-white" />
                 </span>
                 {{ config('app.name', 'Laravel') }}
@@ -23,29 +25,23 @@
             @endphp
 
             <div class="relative z-20 mt-auto">
-                <div class="mb-6 italic font-base text-3xl xl:text-4xl">
-                    Flux has enabled me to design, build, and deliver apps faster than ever before.
+                <div class="mb-6 font-medium text-3xl xl:text-4xl leading-relaxed">
+                    Construye hábitos que transforman tu vida, un día a la vez.
                 </div>
                 <div class="flex gap-4">
-                    <flux:avatar src="https://fluxui.dev/img/demo/caleb.png" size="xl" />
+                    <img src="{{ asset('img/habit-xp-logo.png') }}" alt="Habit Tracker" class="w-16 h-16 rounded-lg" />
                     <div class="flex flex-col justify-center font-medium">
-                        <div class="text-lg">Caleb Porzio</div>
-                        <div class="text-zinc-300">Creator of Livewire</div>
+                        <div class="text-lg">Habit Tracker</div>
+                        <div class="text-zinc-300">Tu compañero de productividad</div>
                     </div>
                 </div>
-                <blockquote class="space-y-2">
-                    <flux:heading size="lg">&ldquo;{{ trim($message) }}&rdquo;</flux:heading>
-                    <footer>
-                        <flux:heading>{{ trim($author) }}</flux:heading>
-                    </footer>
-                </blockquote>
             </div>
         </div>
         <div class="w-full lg:p-8">
             <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                 <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden"
                     wire:navigate>
-                    <span class="flex h-9 w-9 items-center justify-center rounded-md">
+                    <span class="flex h-32 w-32 items-center justify-center rounded-md">
                         <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
                     </span>
 

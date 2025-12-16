@@ -51,7 +51,7 @@ export default function pomodoroStore() {
          * Initialize the store
          */
         init() {
-            console.log('Initializing Pomodoro store...');
+            // console.log('Initializing Pomodoro store...');
             
             // Load saved state
             this.loadFromLocalStorage();
@@ -139,7 +139,7 @@ export default function pomodoroStore() {
          * Resume the timer
          */
         resumeTimer() {
-            console.log('Resuming timer');
+            // console.log('Resuming timer');
             
             this.timerState = 'running';
             this.startCountdown();
@@ -152,7 +152,7 @@ export default function pomodoroStore() {
          * Stop the timer
          */
         stopTimer() {
-            console.log('Stopping timer');
+            // console.log('Stopping timer');
             
             this.timerState = 'idle';
             this.stopCountdown();
@@ -169,7 +169,7 @@ export default function pomodoroStore() {
          * Complete the timer
          */
         completeTimer() {
-            console.log('Timer completed');
+            // console.log('Timer completed');
             
             const wasBreak = this.timerType !== 'pomodoro';
             
@@ -213,7 +213,7 @@ export default function pomodoroStore() {
          * Start a break
          */
         startBreak(type, duration = null) {
-            console.log('Starting break', { type });
+            // console.log('Starting break', { type });
             
             const breakDuration = duration || (type === 'long_break' 
                 ? this.longBreakDuration 
@@ -230,7 +230,7 @@ export default function pomodoroStore() {
          * Skip the current break
          */
         skipBreak() {
-            console.log('Skipping break');
+            // console.log('Skipping break');
             
             if (this.timerType === 'short_break' || this.timerType === 'long_break') {
                 this.stopTimer();
@@ -248,7 +248,7 @@ export default function pomodoroStore() {
             this.cycleCount++;
             this.consecutivePomodoros++;
             
-            console.log('Cycle incremented', { cycleCount: this.cycleCount });
+            // console.log('Cycle incremented', { cycleCount: this.cycleCount });
             
             // Sync with backend
             this.syncCycleWithBackend();
@@ -261,7 +261,7 @@ export default function pomodoroStore() {
             this.cycleCount = 0;
             this.consecutivePomodoros = 0;
             
-            console.log('Cycle reset');
+            // console.log('Cycle reset');
             
             // Sync with backend
             this.syncCycleWithBackend();
@@ -383,7 +383,7 @@ export default function pomodoroStore() {
          * Sync with backend (Livewire)
          */
         syncWithBackend() {
-            console.log('Syncing with backend...');
+            // console.log('Syncing with backend...');
             
             window.dispatchEvent(new CustomEvent('sync-timer-state', {
                 detail: {
@@ -504,7 +504,7 @@ export default function pomodoroStore() {
             
             // If timer state was cleared in another tab
             if (!event.newValue) {
-                console.log('Timer stopped in another tab');
+                // console.log('Timer stopped in another tab');
                 this.stopCountdown();
                 this.stopBackendSync();
                 this.timerState = 'idle';
@@ -526,7 +526,7 @@ export default function pomodoroStore() {
                 
                 // Timer started in another tab
                 if (newState.timerState === 'running' && this.timerState !== 'running') {
-                    console.log('Timer started in another tab, syncing...');
+                    // console.log('Timer started in another tab, syncing...');
                     this.syncStateFromOtherTab(newState);
                     this.startCountdown();
                     this.startBackendSync();
@@ -536,7 +536,7 @@ export default function pomodoroStore() {
                 
                 // Timer paused in another tab
                 if (newState.timerState === 'paused' && this.timerState === 'running') {
-                    console.log('Timer paused in another tab');
+                    // console.log('Timer paused in another tab');
                     this.timerState = 'paused';
                     this.stopCountdown();
                     this.syncStateFromOtherTab(newState);
@@ -545,7 +545,7 @@ export default function pomodoroStore() {
                 
                 // Timer resumed in another tab
                 if (newState.timerState === 'running' && this.timerState === 'paused') {
-                    console.log('Timer resumed in another tab');
+                    // console.log('Timer resumed in another tab');
                     this.timerState = 'running';
                     this.syncStateFromOtherTab(newState);
                     this.startCountdown();
@@ -554,7 +554,7 @@ export default function pomodoroStore() {
                 
                 // Timer completed in another tab
                 if (oldState && oldState.timerState === 'running' && newState.timerState === 'idle') {
-                    console.log('Timer completed in another tab');
+                    // console.log('Timer completed in another tab');
                     this.stopCountdown();
                     this.stopBackendSync();
                     this.timerState = 'idle';

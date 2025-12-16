@@ -1,19 +1,19 @@
 <div>
     @if($showModal)
-        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" wire:click="closeModal">
-            <div class="bg-white w-full max-w-sm rounded-lg shadow-2xl border border-[#E9E9E7] overflow-hidden transform scale-100 transition-all" 
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6" wire:click="closeModal">
+            <div class="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-sm sm:rounded-lg shadow-2xl border-0 sm:border border-[#E9E9E7] overflow-hidden transform scale-100 transition-all flex flex-col" 
                  wire:click.stop>
                 
                 {{-- Modal Header --}}
-                <div class="bg-[#FBFBFA] px-4 py-3 border-b border-[#E9E9E7] flex justify-between items-center">
+                <div class="bg-[#FBFBFA] px-4 py-3 border-b border-[#E9E9E7] flex justify-between items-center flex-shrink-0">
                     <h3 class="text-sm font-semibold text-[#37352F]">
                         {{ $isEditing ? 'Editar Categoría' : 'Nueva Categoría' }}
                     </h3>
-                    <button wire:click="closeModal" class="text-gray-400 hover:text-gray-700 transition">✕</button>
+                    <button wire:click="closeModal" class="text-gray-400 hover:text-gray-700 transition p-1">✕</button>
                 </div>
 
                 {{-- Modal Body --}}
-                <div class="p-5 space-y-5">
+                <div class="p-5 space-y-5 overflow-y-auto flex-1">
                     
                     {{-- Name Field --}}
                     <div>
@@ -22,7 +22,7 @@
                         </label>
                         <input type="text" 
                                wire:model.live="name"
-                               class="w-full text-sm text-[#37352F] border border-[rgba(55,53,47,0.16)] rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#2383E2]/20 focus:border-[#2383E2] transition shadow-sm"
+                               class="w-full text-sm text-[#37352F] border border-[rgba(55,53,47,0.16)] rounded px-3 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-[#2383E2]/20 focus:border-[#2383E2] transition shadow-sm"
                                placeholder="Escribe un nombre...">
                         @error('name')
                             <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
@@ -41,13 +41,13 @@
                             <div class="flex-1">
                                 <input type="text" 
                                        wire:model.live="icon"
-                                       class="w-full text-sm text-[#37352F] border border-[rgba(55,53,47,0.16)] rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#2383E2]/20 focus:border-[#2383E2] transition shadow-sm"
+                                       class="w-full text-sm text-[#37352F] border border-[rgba(55,53,47,0.16)] rounded px-3 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-[#2383E2]/20 focus:border-[#2383E2] transition shadow-sm"
                                        placeholder="Emoji...">
                             </div>
                         </div>
                         
                         {{-- Emoji Picker --}}
-                        <div class="mt-3 grid grid-cols-8 gap-2">
+                        <div class="mt-3 grid grid-cols-6 sm:grid-cols-8 gap-2">
                             @foreach(['📁', '💼', '🧘', '📚', '👥', '🎨', '🏠', '💰', '⭐', '🔥', '💪', '🎯', '🌱', '🎓', '🏃', '🍎', '💡', '🎵', '✈️', '🎮', '📝', '🏆', '💻', '📱'] as $emoji)
                                 <button type="button"
                                         wire:click="$set('icon', '{{ $emoji }}')"
@@ -79,7 +79,7 @@
                             @foreach($this->availableColors as $availableColor)
                                 <button type="button"
                                         wire:click="$set('color', '{{ $availableColor }}')"
-                                        class="relative w-6 h-6 rounded-full cursor-pointer transition-transform hover:scale-110 {{ $color === $availableColor ? 'ring-2 ring-offset-2 ring-[#2383E2]' : '' }}"
+                                        class="relative w-7 h-7 sm:w-6 sm:h-6 rounded-full cursor-pointer transition-transform hover:scale-110 {{ $color === $availableColor ? 'ring-2 ring-offset-2 ring-[#2383E2]' : '' }}"
                                         style="background-color: {{ $availableColor }};"
                                         title="{{ $availableColor }}">
                                 </button>
@@ -96,13 +96,13 @@
                 </div>
 
                 {{-- Modal Footer --}}
-                <div class="p-4 border-t border-[#E9E9E7] flex justify-end gap-2 bg-[#FBFBFA]">
+                <div class="p-4 border-t border-[#E9E9E7] flex justify-end gap-2 bg-[#FBFBFA] flex-shrink-0">
                     <button wire:click="closeModal" 
-                            class="px-3 py-1.5 text-sm font-medium text-[#555555] hover:bg-[#EFEFED] rounded transition">
+                            class="px-4 py-2 sm:px-3 sm:py-1.5 text-sm font-medium text-[#555555] hover:bg-[#EFEFED] rounded transition">
                         Cancelar
                     </button>
                     <button wire:click="save" 
-                            class="px-3 py-1.5 text-sm font-medium text-white bg-[#2383E2] hover:bg-[#1B74C9] rounded shadow-sm transition">
+                            class="px-4 py-2 sm:px-3 sm:py-1.5 text-sm font-medium text-white bg-[#2383E2] hover:bg-[#1B74C9] rounded shadow-sm transition">
                         {{ $isEditing ? 'Actualizar' : 'Guardar' }}
                     </button>
                 </div>

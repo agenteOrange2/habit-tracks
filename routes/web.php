@@ -11,6 +11,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Debug route - remove after testing
+Route::get('/debug-livewire', function () {
+    return response()->json([
+        'status' => 'ok',
+        'livewire_installed' => class_exists(\Livewire\Livewire::class),
+        'app_url' => config('app.url'),
+        'asset_url' => config('app.asset_url'),
+        'session_driver' => config('session.driver'),
+        'csrf_token' => csrf_token(),
+        'php_version' => PHP_VERSION,
+    ]);
+});
+
 // Welcome page - accessible to all users
 Route::get('/welcome', function () {
     return view('welcome');

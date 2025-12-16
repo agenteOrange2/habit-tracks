@@ -22,6 +22,12 @@ use Laravel\Fortify\Features;
 Route::get('/dashboard', App\Livewire\Dashboard\Index::class)
     ->name('admin.dashboard');
 
+// Admin Users Management (Only for admins)
+Route::middleware('admin')->group(function () {
+    Route::get('/users', App\Livewire\Admin\Users\Index::class)
+        ->name('admin.users.index');
+});
+
 // Habits Management
 Route::get('/habits', App\Livewire\Habits\HabitList::class)
     ->name('admin.habits.index');
@@ -39,6 +45,10 @@ Route::get('/categories', App\Livewire\Admin\Categories\CategoryList::class)
 // Difficulties Management
 Route::get('/difficulties', App\Livewire\Admin\Difficulties\DifficultyList::class)
     ->name('admin.difficulties.index');
+
+// Achievements Management
+Route::get('/achievements', App\Livewire\Admin\AchievementManager::class)
+    ->name('admin.achievements.index');
 
 // XP History
 Route::get('/xp-history', App\Livewire\XPHistoryPage::class)

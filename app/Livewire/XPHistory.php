@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\MilestoneBadge;
 use App\Services\LevelService;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -34,9 +35,26 @@ class XPHistory extends Component
     }
 
     #[Computed]
-    public function milestoneBadges(): array
+    public function milestoneBadges()
     {
-        return $this->userLevel?->milestone_badges ?? [];
+        $user = auth()->user();
+        
+        // If user has no badges in DB, create defaults
+        if ($user->milestoneBadges()->count() === 0) {
+            MilestoneBadge::createDefaultsForUser($user);
+        }
+        
+        return $user->milestoneBadges()->ordered()->get()->map(function ($badge) use ($user) {
+            return [
+                'id' => $badge->id,
+                'name' => $badge->name,
+                'icon' => $badge->icon,
+                'level' => $badge->level_required,
+                'description' => $badge->description,
+                'achieved' => $badge->isAchievedBy($user),
+                'is_default' => $badge->is_default,
+            ];
+        })->toArray();
     }
 
     public function render()

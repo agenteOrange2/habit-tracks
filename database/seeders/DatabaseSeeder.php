@@ -13,15 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create test user
+        // Create test user (admin)
         $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'maubr170295@gmail.com',
             'password' => 'Admin2025+?',
+            'is_admin' => true,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
-        ]);
+        ]);        
 
         // Create all default data for user (stats, level, categories, difficulties)
         $defaultDataService = app(DefaultDataService::class);
@@ -36,6 +37,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RewardSeeder::class,
             RewardClaimSeeder::class,
+            AchievementSeeder::class,
         ]);
     }
 }

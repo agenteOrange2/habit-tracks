@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('custom_avatar')->nullable()->after('avatar_style'); // Custom uploaded avatar path
+            $table->boolean('is_admin')->default(false)->after('email');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('custom_avatar');
+            $table->dropColumn('is_admin');
         });
     }
 };

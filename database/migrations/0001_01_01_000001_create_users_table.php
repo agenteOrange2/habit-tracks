@@ -15,6 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('avatar_seed')->nullable();
+            $table->string('avatar_style')->default('notionists');
+            $table->string('custom_avatar')->nullable(); // Custom uploaded avatar path
+            $table->string('player_class')->default('programador'); // Player class/role
+            $table->string('cover_image')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
@@ -22,6 +27,8 @@ return new class extends Migration
             $table->integer('energy_level')->default(100);
             $table->timestamp('last_energy_update')->nullable();
             $table->timestamps();
+
+             
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -4,7 +4,7 @@
         @if($this->currentCoverUrl)
             <img src="{{ $this->currentCoverUrl }}" class="w-full h-full object-cover">
         @else
-            <img src="https://images.unsplash.com/photo-1506259091721-347f798196d4?auto=format&fit=crop&w=1200&q=80" 
+            <img src="{{asset('bg-cover/bg_habit_xp.jpg')}}" 
                  class="w-full h-full object-cover opacity-60 dark:opacity-40">
         @endif
         
@@ -40,6 +40,9 @@
         @if (session('passwordMessage'))
             <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl text-green-700 dark:text-green-300 text-sm">✓ {{ session('passwordMessage') }}</div>
         @endif
+        @if (session('error'))
+            <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm">✕ {{ session('error') }}</div>
+        @endif
         @error('newAvatar') <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm">{{ $message }}</div> @enderror
         @error('newCover') <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm">{{ $message }}</div> @enderror
 
@@ -53,8 +56,8 @@
             {{-- Properties Section --}}
             <div class="space-y-3 border-b border-zinc-200 dark:border-zinc-700 pb-6">
                 {{-- Class/Role --}}
-                <div class="flex items-center py-2">
-                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm w-40 flex-shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center py-2 gap-2 sm:gap-0">
+                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm sm:w-40 flex-shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         <span>Clase / Rol</span>
                     </div>
@@ -78,14 +81,14 @@
 
                 {{-- Level & XP --}}
                 @if($this->userLevel)
-                <div class="flex items-center py-2">
-                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm w-40 flex-shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center py-2 gap-2 sm:gap-0">
+                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm sm:w-40 flex-shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         <span>Nivel & XP</span>
                     </div>
-                    <div class="flex-1 flex items-center gap-3">
+                    <div class="flex-1 flex flex-wrap items-center gap-2 sm:gap-3">
                         <span class="text-sm font-mono bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded text-amber-700 dark:text-amber-300 font-bold">LVL {{ $this->userLevel->current_level ?? 1 }}</span>
-                        <div class="w-48 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden relative group">
+                        <div class="w-full sm:w-48 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden relative group order-last sm:order-none">
                             <div class="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full transition-all duration-500" style="width: {{ min(100, $this->userLevel->progress_percentage ?? 0) }}%"></div>
                         </div>
                         <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $this->userLevel->current_xp ?? 0 }}/{{ $this->userLevel->required_xp ?? 100 }} XP</span>
@@ -95,8 +98,8 @@
                 @endif
 
                 {{-- Email --}}
-                <div class="flex items-center py-2">
-                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm w-40 flex-shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center py-2 gap-2 sm:gap-0">
+                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm sm:w-40 flex-shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         <span>Email</span>
                     </div>
@@ -114,25 +117,46 @@
                     Apariencia
                 </h3>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {{-- Foto personalizada guardada (si existe) --}}
+                    @if(auth()->user()->custom_avatar)
+                        <div wire:click="selectCustomAvatar" 
+                             class="border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all {{ !$avatar_seed ? 'ring-2 ring-zinc-900 dark:ring-white border-transparent' : 'border-zinc-200 dark:border-zinc-700' }}">
+                            <div class="h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 relative">
+                                <img src="{{ asset('storage/' . auth()->user()->custom_avatar) }}" class="w-full h-full object-cover" alt="Mi foto">
+                                @if(!$avatar_seed)
+                                    <div class="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 flex items-center gap-1">
+                                <span>📸</span> Mi foto
+                            </div>
+                        </div>
+                    @endif
+                    
+                    {{-- Avatares predefinidos --}}
                     @foreach($avatarOptions as $avatar)
-                        <div wire:click="selectAvatar('{{ $avatar['seed'] }}')" class="border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all {{ $avatar_seed === $avatar['seed'] && !$custom_avatar ? 'ring-2 ring-zinc-900 dark:ring-white border-transparent' : 'border-zinc-200 dark:border-zinc-700' }}">
+                        <div wire:click="selectAvatar('{{ $avatar['seed'] }}')" class="border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all {{ $avatar_seed === $avatar['seed'] ? 'ring-2 ring-zinc-900 dark:ring-white border-transparent' : 'border-zinc-200 dark:border-zinc-700' }}">
                             <div class="h-24 {{ $avatar['bg'] }} relative">
                                 <img src="https://api.dicebear.com/7.x/notionists/svg?seed={{ $avatar['seed'] }}" class="w-full h-full object-contain p-2" alt="{{ $avatar['name'] }}">
+                                @if($avatar_seed === $avatar['seed'])
+                                    <div class="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                @endif
                             </div>
                             <div class="p-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800">{{ $avatar['name'] }}</div>
                         </div>
                     @endforeach
-                    <label class="border border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all {{ $custom_avatar ? 'ring-2 ring-zinc-900 dark:ring-white border-transparent' : '' }}">
-                        @if($custom_avatar)
-                            <div class="h-24 bg-zinc-100 dark:bg-zinc-700"><img src="{{ asset('storage/' . $custom_avatar) }}" class="w-full h-full object-cover" alt="Mi foto"></div>
-                            <div class="p-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800">Mi foto</div>
-                        @else
-                            <div class="h-24 bg-zinc-50 dark:bg-zinc-800 flex flex-col items-center justify-center text-zinc-400">
-                                <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                <span class="text-xs">Subir foto</span>
-                            </div>
-                            <div class="p-2 text-sm font-medium text-zinc-400 bg-white dark:bg-zinc-800">Personalizado</div>
-                        @endif
+                    
+                    {{-- Subir nueva foto --}}
+                    <label class="border border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg hover:border-blue-400 transition-all group">
+                        <div class="h-24 bg-zinc-50 dark:bg-zinc-800 flex flex-col items-center justify-center text-zinc-400 group-hover:text-blue-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
+                            <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <span class="text-xs">{{ auth()->user()->custom_avatar ? 'Cambiar foto' : 'Subir foto' }}</span>
+                        </div>
+                        <div class="p-2 text-sm font-medium text-zinc-400 bg-white dark:bg-zinc-800 group-hover:text-blue-500">Personalizado</div>
                         <input type="file" wire:model="newAvatar" accept="image/*" class="hidden">
                     </label>
                 </div>
@@ -223,6 +247,91 @@
             </a>
         </div>
 
+
+        {{-- Admin Tools Section --}}
+        <div class="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+            <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-zinc-900 dark:text-white">
+                <span class="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider">Admin</span>
+                Herramientas del Sistema
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {{-- Optimize Clear --}}
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-zinc-900 dark:text-white text-sm">Optimize Clear</h4>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-3">Limpia caches optimizadas</p>
+                            <button wire:click="runOptimizeClear" wire:loading.attr="disabled" wire:target="runOptimizeClear"
+                                    class="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors">
+                                <span wire:loading.remove wire:target="runOptimizeClear">🧹 Ejecutar</span>
+                                <span wire:loading wire:target="runOptimizeClear">...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Cache Clear --}}
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-zinc-900 dark:text-white text-sm">Cache Clear</h4>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-3">Limpia TODAS las caches</p>
+                            <button wire:click="runCacheClear" wire:loading.attr="disabled" wire:target="runCacheClear"
+                                    class="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors">
+                                <span wire:loading.remove wire:target="runCacheClear">� Ejeecutar</span>
+                                <span wire:loading wire:target="runCacheClear">...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Storage Link --}}
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-zinc-900 dark:text-white text-sm">Storage Link</h4>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-3">Crea enlace simbólico</p>
+                            <button wire:click="runStorageLink" wire:loading.attr="disabled" wire:target="runStorageLink"
+                                    class="bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors">
+                                <span wire:loading.remove wire:target="runStorageLink">🔗 Ejecutar</span>
+                                <span wire:loading wire:target="runStorageLink">...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Debug Info --}}
+            <div class="mt-6 p-4 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <h4 class="font-medium text-zinc-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                    🔍 Debug Info <span class="text-xs text-zinc-500">(para diagnóstico)</span>
+                </h4>
+                <div class="text-xs font-mono bg-zinc-900 text-green-400 p-3 rounded-lg overflow-x-auto">
+                    <p>User ID: {{ $this->debugInfo['user_id'] }}</p>
+                    <p>Email: {{ $this->debugInfo['user_email'] }}</p>
+                    <p>Total Habits: {{ $this->debugInfo['habits_count'] }}</p>
+                    <p class="mt-2 text-cyan-400">Config:</p>
+                    <p>APP_URL: {{ $this->debugInfo['app_url'] }}</p>
+                    <p>APP_ENV: {{ $this->debugInfo['app_env'] }}</p>
+                    <p>LIVEWIRE_URL: {{ $this->debugInfo['livewire_url'] }}</p>
+                    <p>ASSET_URL: {{ $this->debugInfo['asset_url'] }}</p>
+                    <p class="mt-2 text-zinc-400">Tus hábitos:</p>
+                    @foreach($this->debugInfo['habits'] as $habit)
+                        <p class="text-yellow-400">→ {{ $habit }}</p>
+                    @endforeach
+                </div>
+            </div>
+        </div>
 
         {{-- Danger Zone --}}
         <div class="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700">

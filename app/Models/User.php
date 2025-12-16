@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
         'theme_id',
         'energy_level',
         'last_energy_update',
@@ -74,18 +75,24 @@ class User extends Authenticatable
 
     /**
      * Get the user's avatar URL (custom or DiceBear)
+     * Priority: avatar_seed (gallery) > custom_avatar (uploaded photo)
      */
     public function getAvatarUrlAttribute(): string
     {
-        // If user has a custom avatar, use it
+        // If user selected a gallery avatar (avatar_seed is set), use DiceBear
+        if ($this->avatar_seed) {
+            $style = $this->avatar_style ?? 'notionists';
+            return "https://api.dicebear.com/7.x/{$style}/svg?seed={$this->avatar_seed}";
+        }
+        
+        // If user has a custom avatar uploaded, use it
         if ($this->custom_avatar) {
             return asset('storage/' . $this->custom_avatar);
         }
         
-        // Otherwise use DiceBear
-        $seed = $this->avatar_seed ?? $this->email;
+        // Default: use email as seed for DiceBear
         $style = $this->avatar_style ?? 'notionists';
-        return "https://api.dicebear.com/7.x/{$style}/svg?seed={$seed}";
+        return "https://api.dicebear.com/7.x/{$style}/svg?seed={$this->email}";
     }
 
     /**
@@ -188,6 +195,11 @@ class User extends Authenticatable
         return $this->hasMany(JournalEntry::class);
     }
 
+    public function journalCategories(): HasMany
+    {
+        return $this->hasMany(JournalCategory::class)->ordered();
+    }
+
     public function focusMode(): HasMany
     {
         return $this->hasMany(FocusMode::class);
@@ -228,6 +240,12 @@ class User extends Authenticatable
     public function googleCalendarToken(): HasOne
     {
         return $this->hasOne(GoogleCalendarToken::class);
+    }
+
+    /* Milestone Badges */
+    public function milestoneBadges(): HasMany
+    {
+        return $this->hasMany(MilestoneBadge::class)->ordered();
     }
 
     /**

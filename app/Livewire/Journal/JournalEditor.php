@@ -13,6 +13,7 @@ class JournalEditor extends Component
     public string $content = '';
     public ?string $mood = null;
     public ?int $energyLevel = null;
+    public ?int $categoryId = null;
 
     public function mount(?JournalEntry $entry = null): void
     {
@@ -21,6 +22,7 @@ class JournalEditor extends Component
             $this->content = $entry->content;
             $this->mood = $entry->mood?->value;
             $this->energyLevel = $entry->energy_level;
+            $this->categoryId = $entry->category_id;
         }
     }
 
@@ -33,6 +35,12 @@ class JournalEditor extends Component
     public function setEnergyLevel(int $level): void
     {
         $this->energyLevel = $level;
+        $this->save();
+    }
+    
+    public function setCategory(?int $categoryId): void
+    {
+        $this->categoryId = $categoryId;
         $this->save();
     }
 
@@ -48,6 +56,7 @@ class JournalEditor extends Component
             'content' => $this->content ?: '',
             'mood' => $this->mood,
             'energy_level' => $this->energyLevel,
+            'category_id' => $this->categoryId,
         ];
 
         if (!$this->entry) {
@@ -62,6 +71,7 @@ class JournalEditor extends Component
         return view('livewire.journal.journal-editor', [
             'moods' => Mood::cases(),
             'date' => $this->entry?->created_at ?? now(),
+            'categories' => Auth::user()->journalCategories,
         ])->layout('components.layouts.app');
     }
 }

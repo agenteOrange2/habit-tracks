@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Achievement;
 use App\Models\Category;
 use App\Models\Difficulty;
 use App\Models\User;
 use App\Models\UserStats;
 use App\Models\UserLevel;
+use App\Enums\AchievementType;
 
 class DefaultDataService
 {
@@ -125,5 +127,75 @@ class DefaultDataService
         $this->createDefaultDifficulties($user);
         $this->createDefaultStats($user);
         $this->createDefaultLevel($user);
+        $this->ensureDefaultAchievementsExist();
+    }
+
+    /**
+     * Ensure default achievements exist (global, not per-user).
+     */
+    public function ensureDefaultAchievementsExist(): void
+    {
+        // Only create if no achievements exist
+        if (Achievement::count() > 0) {
+            return;
+        }
+
+        $achievements = [
+            // 5 logros básicos iniciales
+            [
+                'name' => 'Primer Paso',
+                'description' => 'Completa tu primer hábito',
+                'icon' => '🌱',
+                'category' => 'habits',
+                'requirement_type' => AchievementType::TOTAL_HABITS->value,
+                'requirement_value' => 1,
+                'points_reward' => 10,
+                'is_secret' => false,
+            ],
+            [
+                'name' => 'En Marcha',
+                'description' => 'Completa 5 hábitos en total',
+                'icon' => '🚶',
+                'category' => 'habits',
+                'requirement_type' => AchievementType::TOTAL_HABITS->value,
+                'requirement_value' => 5,
+                'points_reward' => 15,
+                'is_secret' => false,
+            ],
+            [
+                'name' => 'Racha Inicial',
+                'description' => 'Mantén una racha de 3 días',
+                'icon' => '🔥',
+                'category' => 'streaks',
+                'requirement_type' => AchievementType::HABIT_STREAK->value,
+                'requirement_value' => 3,
+                'points_reward' => 20,
+                'is_secret' => false,
+            ],
+            [
+                'name' => 'Primer Pomodoro',
+                'description' => 'Completa tu primer pomodoro',
+                'icon' => '🍅',
+                'category' => 'pomodoro',
+                'requirement_type' => AchievementType::POMODOROS->value,
+                'requirement_value' => 1,
+                'points_reward' => 10,
+                'is_secret' => false,
+            ],
+            [
+                'name' => 'Día Perfecto',
+                'description' => 'Completa todos los hábitos del día',
+                'icon' => '✨',
+                'category' => 'daily',
+                'requirement_type' => AchievementType::CONSECUTIVE_DAYS->value,
+                'requirement_value' => 1,
+                'points_reward' => 25,
+                'is_secret' => false,
+            ],
+        ];
+
+        foreach ($achievements as $achievement) {
+            Achievement::create($achievement);
+        }
     }
 }

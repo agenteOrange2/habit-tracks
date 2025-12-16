@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\{User, Habit, PomodoroSession};
+use App\Enums\AchievementType;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -102,10 +103,15 @@ class PomodoroService
             // Update user statistics
             $user = $session->user;
             $stats = $user->stats;
-            
+
             if ($stats) {
                 $stats->increment('total_pomodoros');
                 $stats->increment('total_focus_time', $session->duration_minutes);
+
+                // Verificar logros de pomodoro (solo para sesiones tipo pomodoro, no breaks)
+                if ($session->session_type === 'pomodoro') {
+                    $this->checkPomodoroAchievements($user, $stats->total_pomodoros);
+                }
             }
 
             Log::info('Pomodoro session completed', [
@@ -114,6 +120,12 @@ class PomodoroService
                 'duration' => $session->duration_minutes,
             ]);
         });
+    }
+
+    private function checkPomodoroAchievements(User $user, int $totalPomodoros): void
+    {
+        $achievementService = app(AchievementService::class);
+        $achievementService->checkAndUnlock($user, AchievementType::POMODOROS, $totalPomodoros);
     }
 
     /**

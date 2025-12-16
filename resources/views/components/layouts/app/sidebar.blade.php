@@ -78,13 +78,37 @@
 
             {{-- Recompensas --}}
             <flux:navlist.group heading="Recompensas" class="grid">
-                <a href="{{ route('rewards.index') }}" 
+                <a href="{{ route('rewards.index') }}"
                    wire:navigate
                    class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('rewards.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
                     <span class="text-lg">🎁</span>
                     <span>Recompensas</span>
                 </a>
+                <a href="{{ route('admin.achievements.index') }}"
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.achievements.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">🏆</span>
+                    <span>Logros</span>
+                </a>
+                <a href="{{ route('admin.xp-history') }}"
+                   wire:navigate
+                   class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.xp-history') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                    <span class="text-lg">⚡</span>
+                    <span>Historial XP</span>
+                </a>
             </flux:navlist.group>
+
+            {{-- Admin (Solo para administradores) --}}
+            @if(auth()->user()->is_admin)
+                <flux:navlist.group heading="Administración" class="grid">
+                    <a href="{{ route('admin.users.index') }}"
+                       wire:navigate
+                       class="flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-zinc-200 dark:bg-zinc-700 font-medium' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800' }} text-zinc-700 dark:text-zinc-300">
+                        <span class="text-lg">👥</span>
+                        <span>Usuarios</span>
+                    </a>
+                </flux:navlist.group>
+            @endif
         </flux:navlist>
 
         <!-- Pomodoro Timer Widget -->
@@ -145,106 +169,68 @@
         --}}
         <flux:spacer />
 
-        {{-- Level Badge (Desktop) --}}
+        {{-- User Profile Card with Level --}}
         @auth
-            <div class="px-4 mb-4">
-                <livewire:level-badge />
-            </div>
+            <livewire:layout.sidebar-profile />
         @endauth
-
-        <!-- Desktop User Menu -->
-        <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-            <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
-                icon:trailing="chevrons-up-down" />
-
-            <flux:menu class="w-[220px]">
-                <flux:menu.radio.group>
-                    <div class="p-0 text-sm font-normal">
-                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                    {{ auth()->user()->initials() }}
-                                </span>
-                            </span>
-
-                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </flux:menu.radio.group>
-
-                <flux:menu.separator />
-
-                <flux:menu.radio.group>
-                    <flux:menu.item :href="route('admin.settings.profile')" icon="cog" wire:navigate>
-                        {{ __('Settings') }}</flux:menu.item>
-                </flux:menu.radio.group>
-
-                <flux:menu.separator />
-
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                        {{ __('Log Out') }}
-                    </flux:menu.item>
-                </form>
-            </flux:menu>
-        </flux:dropdown>
     </flux:sidebar>
 
     <!-- Mobile User Menu -->
     <flux:header class="lg:hidden">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
-        {{-- Level Badge --}}
-        @auth
-            <livewire:level-badge />
-        @endauth
-
         <flux:spacer />
 
-        <flux:dropdown position="top" align="end">
-            <flux:profile :initials="auth()->user()->initials()" icon-trailing="chevron-down" />
+        {{-- Mobile Profile Badge --}}
+        @auth
+            @php
+                $mobileUser = auth()->user();
+                $mobileLevel = $mobileUser->level;
+            @endphp
+            <flux:dropdown position="top" align="end">
+                <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                    <img class="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-zinc-700 shadow-sm" 
+                         src="{{ $mobileUser->avatar_url }}" 
+                         alt="Perfil">
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded">
+                        Nv.{{ $mobileLevel?->current_level ?? 1 }}
+                    </span>
+                </button>
 
-            <flux:menu>
-                <flux:menu.radio.group>
-                    <div class="p-0 text-sm font-normal">
-                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                    {{ auth()->user()->initials() }}
-                                </span>
-                            </span>
-
-                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                <span class="truncate text-xs">{{ auth()->user()->email }}</span>
+                <flux:menu class="w-56">
+                    {{-- User info --}}
+                    <div class="px-3 py-2 border-b border-zinc-200 dark:border-zinc-700">
+                        <p class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $mobileUser->name }}</p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ $mobileUser->email }}</p>
+                        {{-- XP Progress --}}
+                        <div class="mt-2 flex items-center gap-2">
+                            <div class="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full"
+                                     style="width: {{ $mobileLevel?->progress_percentage ?? 0 }}%"></div>
                             </div>
+                            <span class="text-[10px] text-zinc-500">{{ $mobileLevel?->current_xp ?? 0 }}/{{ $mobileLevel?->required_xp ?? 100 }} XP</span>
                         </div>
                     </div>
-                </flux:menu.radio.group>
 
-                <flux:menu.separator />
-
-                <flux:menu.radio.group>
                     <flux:menu.item :href="route('admin.settings.profile')" icon="cog" wire:navigate>
-                        {{ __('Settings') }}</flux:menu.item>
-                </flux:menu.radio.group>
-
-                <flux:menu.separator />
-
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                        {{ __('Log Out') }}
+                        Configuración
                     </flux:menu.item>
-                </form>
-            </flux:menu>
-        </flux:dropdown>
+                    
+                    <flux:menu.item :href="route('admin.xp-history')" icon="bolt" wire:navigate>
+                        Historial XP
+                    </flux:menu.item>
+
+                    <flux:menu.separator />
+
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full text-red-600 dark:text-red-400">
+                            Cerrar sesión
+                        </flux:menu.item>
+                    </form>
+                </flux:menu>
+            </flux:dropdown>
+        @endauth
     </flux:header>
 
     {{ $slot }}
